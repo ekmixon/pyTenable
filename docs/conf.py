@@ -33,7 +33,7 @@ import tenable
 
 project = u'pyTenable'
 year = datetime.datetime.now().year
-copyright = u'{}, Tenable, Inc.'.format(year)
+copyright = f'{year}, Tenable, Inc.'
 author = u'Tenable, Inc.'
 
 # The short X.Y version

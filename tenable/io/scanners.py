@@ -95,11 +95,14 @@ class ScannersAPI(TIOEndpoint):
 
             >>> tio.scanners.control_scan(1, '00000000-0000-0000-0000-000000000000', 'stop')
         '''
-        self._api.post('scanners/{}/scans/{}/control'.format(
-            self._check('scanner_id', scanner_id, int),
-            self._check('scan_uuid', scan_uuid, str),
-            ), json={'action': self._check('action', action, str,
-                                        choices=['stop', 'pause', 'resume'])})
+        self._api.post(
+            f"scanners/{self._check('scanner_id', scanner_id, int)}/scans/{self._check('scan_uuid', scan_uuid, str)}/control",
+            json={
+                'action': self._check(
+                    'action', action, str, choices=['stop', 'pause', 'resume']
+                )
+            },
+        )
 
     def delete(self, id):
         '''
@@ -118,7 +121,7 @@ class ScannersAPI(TIOEndpoint):
         Examples:
             >>> tio.scanners.delete(1)
         '''
-        self._api.delete('scanners/{}'.format(self._check('id', id, int)))
+        self._api.delete(f"scanners/{self._check('id', id, int)}")
 
     def details(self, id):
         '''
@@ -138,8 +141,7 @@ class ScannersAPI(TIOEndpoint):
             >>> scanner = tio.scanners.details(1)
             >>> pprint(scanner)
         '''
-        return self._api.get('scanners/{}'.format(
-            self._check('id', id, int))).json()
+        return self._api.get(f"scanners/{self._check('id', id, int)}").json()
 
     def edit(self, id, **kwargs):
         '''
@@ -172,7 +174,7 @@ class ScannersAPI(TIOEndpoint):
 
             >>> tio.scanners.edit(1, force_plugin_update=True)
         '''
-        payload = dict()
+        payload = {}
         if ('force_plugin_update' in kwargs
             and self._check('force_plugin_update', kwargs['force_plugin_update'], bool)):
             payload['force_plugin_update'] = 1
@@ -189,8 +191,7 @@ class ScannersAPI(TIOEndpoint):
             and self._check('aws_update_interval', kwargs['aws_update_interval'], int)):
             payload['aws_update_interval'] = kwargs['aws_update_interval']
 
-        self._api.put('settings/{}'.format(self._check('id', id, int)),
-            json=payload)
+        self._api.put(f"settings/{self._check('id', id, int)}", json=payload)
 
     def get_aws_targets(self, id):
         '''
@@ -209,8 +210,9 @@ class ScannersAPI(TIOEndpoint):
             >>> for target in tio.scanners.get_aws_targets(1):
             ...      pprint(target)
         '''
-        return self._api.get('scanners/{}/aws-targets'.format(
-                    self._check('id', id, int))).json()['targets']
+        return self._api.get(
+            f"scanners/{self._check('id', id, int)}/aws-targets"
+        ).json()['targets']
 
     def get_scanner_key(self, id):
         '''
@@ -228,8 +230,11 @@ class ScannersAPI(TIOEndpoint):
         Examples:
             >>> print(tio.scanners.get_scanner_key(1))
         '''
-        return str(self._api.get('scanners/{}/key'.format(
-            self._check('id', id, int))).json()['key'])
+        return str(
+            self._api.get(f"scanners/{self._check('id', id, int)}/key").json()[
+                'key'
+            ]
+        )
 
     def get_scans(self, id):
         '''
@@ -248,8 +253,9 @@ class ScannersAPI(TIOEndpoint):
             >>> for scan in tio.scanners.get_scans(1):
             ...     pprint(scan)
         '''
-        return self._api.get('scanners/{}/scans'.format(
-            self._check('id', id, int))).json()['scans']
+        return self._api.get(
+            f"scanners/{self._check('id', id, int)}/scans"
+        ).json()['scans']
 
     def list(self):
         '''
@@ -288,8 +294,10 @@ class ScannersAPI(TIOEndpoint):
 
             >>> tio.scanners.toggle_link_state(1, False)
         '''
-        self._api.put('scanners/{}/link'.format(self._check('id', id, int)),
-            json={'link': int(self._check('linked', linked, bool))})
+        self._api.put(
+            f"scanners/{self._check('id', id, int)}/link",
+            json={'link': int(self._check('linked', linked, bool))},
+        )
 
     def get_permissions(self, id):
         '''

@@ -29,7 +29,6 @@ def fixture_exclusion(request, api):
             api.exclusions.delete(excl['id'])
         except NotFoundError as err:
             log_exception(err)
-            pass
 
     request.addfinalizer(teardown)
     return excl
@@ -1198,8 +1197,13 @@ def test_exclusion_import_exclusion(api):
     data = '1,"Test-Exclusion","test","127.0.0.1",1617703622,1617789521'
 
     # create path and dynamic filename
-    filename = os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                            '..', 'test_files', 'exclusion-' + str(uuid.uuid4()) + '.csv')
+    filename = os.path.join(
+        os.path.dirname(os.path.realpath(__file__)),
+        '..',
+        'test_files',
+        f'exclusion-{str(uuid.uuid4())}.csv',
+    )
+
 
     # creating file for import
     with open(filename, 'w') as csvfile:

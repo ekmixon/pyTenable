@@ -160,9 +160,10 @@ class VulnsAPI(APIEndpoint):
             ...     print(asset)
         '''
         schema = PaginationSchema()
-        return OTIterator(self._api,
-            path='{}/{}/assets'.format(self._path, id),
-            payload=schema.load(kwargs)
+        return OTIterator(
+            self._api,
+            path=f'{self._path}/{id}/assets',
+            payload=schema.load(kwargs),
         )
 
     def extract(self):

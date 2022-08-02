@@ -50,10 +50,11 @@ class FeedAPI(SCEndpoint):
         self._check('feed_type', feed_type, str, choices=[
             'active', 'passive', 'lce', 'sc', 'all'])
 
-        if not feed_type:
-            return self._api.get('feed').json()['response']
-        else:
-            return self._api.get('feed/{}'.format(feed_type)).json()['response']
+        return (
+            self._api.get(f'feed/{feed_type}').json()['response']
+            if feed_type
+            else self._api.get('feed').json()['response']
+        )
 
     def update(self, feed_type=None):
         '''

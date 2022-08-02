@@ -654,9 +654,9 @@ def test_repositories_export_repository_success(admin, repository):
     '''
     test repositories export repository for success
     '''
-    with open('{}'.format(repository['id']), 'wb') as repo:
+    with open(f"{repository['id']}", 'wb') as repo:
         admin.repositories.export_repository(int(repository['id']), repo)
-    os.remove('{}'.format(repository['id']))
+    os.remove(f"{repository['id']}")
 
 
 def test_repositories_device_info_id_typeerror(security_center):

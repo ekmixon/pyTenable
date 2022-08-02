@@ -159,9 +159,11 @@ def test_editor_details(api):
     scan_ids_list = []
     while flag:
         scan_id = api.scans.create(
-            name='pytest: {}'.format(uuid.uuid4()),
+            name=f'pytest: {uuid.uuid4()}',
             template='advanced',
-            targets=['127.0.0.1'])['id']
+            targets=['127.0.0.1'],
+        )['id']
+
         scan_ids_list.append(scan_id)
         editor_details = api.editor.obj_details('scan', scan_id)
         if 'compliance' in editor_details and 'plugins' in editor_details:

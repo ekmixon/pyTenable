@@ -178,12 +178,13 @@ class PluginAPI(SCEndpoint):
             >>> plugin = sc.alerts.detail(19506)
             >>> pprint(plugin)
        '''
-        params = dict()
+        params = {}
         if fields:
             params['fields'] = ','.join([self._check('field', f, str) for f in fields])
 
-        return self._api.get('plugin/{}'.format(self._check('plugin_id', plugin_id, int)),
-                             params=params).json()['response']
+        return self._api.get(
+            f"plugin/{self._check('plugin_id', plugin_id, int)}", params=params
+        ).json()['response']
 
     def family_list(self, **kwargs):
         '''
@@ -238,12 +239,15 @@ class PluginAPI(SCEndpoint):
             >>> family = sc.plugins.family_details(10)
             >>> pprint(family)
         '''
-        params = dict()
+        params = {}
         if fields:
             params['fields'] = ','.join([self._check('field', f, str)
                                          for f in fields])
 
-        return self._api.get('pluginFamily/{}'.format(self._check('plugin_id', plugin_id, int)), params=params).json()['response']
+        return self._api.get(
+            f"pluginFamily/{self._check('plugin_id', plugin_id, int)}",
+            params=params,
+        ).json()['response']
 
     def family_plugins(self, plugin_id, **kwargs):
         '''
@@ -294,10 +298,11 @@ class PluginAPI(SCEndpoint):
 
         if json_result:
             return self._api.get('plugin', params=query).json()['response']
-        return PluginResultsIterator(self._api,
-                                         _resource='pluginFamily/{}/plugins'.format(
-                                             self._check('plugin_id', plugin_id, int)),
-                                         _offset=offset,
-                                         _limit=limit,
-                                         _query=query,
-                                         _pages_total=pages)
+        return PluginResultsIterator(
+            self._api,
+            _resource=f"pluginFamily/{self._check('plugin_id', plugin_id, int)}/plugins",
+            _offset=offset,
+            _limit=limit,
+            _query=query,
+            _pages_total=pages,
+        )

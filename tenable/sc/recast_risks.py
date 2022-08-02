@@ -110,7 +110,7 @@ class RecastRiskAPI(SCEndpoint):
             >>> for rule in sc.recast_risks.list():
             ...     pprint(rule)
         '''
-        params = dict()
+        params = {}
         if fields:
             params['fields'] = ','.join([self._check('field', f, str)
                                          for f in fields])
@@ -160,13 +160,14 @@ class RecastRiskAPI(SCEndpoint):
             >>> rule = sc.recast_risks.details(1)
             >>> pprint(rule)
         '''
-        params = dict()
+        params = {}
         if fields:
             params['fields'] = ','.join([self._check('field', f, str)
                                          for f in fields])
 
-        return self._api.get('recastRiskRule/{}'.format(self._check('risk_id', risk_id, int)),
-                             params=params).json()['response']
+        return self._api.get(
+            f"recastRiskRule/{self._check('risk_id', risk_id, int)}", params=params
+        ).json()['response']
 
     def delete(self, risk_id):
         '''
@@ -184,8 +185,9 @@ class RecastRiskAPI(SCEndpoint):
         Examples:
             >>> sc.recast_risks.delete(1)
         '''
-        return self._api.delete('recastRiskRule/{}'.format(
-            self._check('risk_id', risk_id, int))).json()['response']
+        return self._api.delete(
+            f"recastRiskRule/{self._check('risk_id', risk_id, int)}"
+        ).json()['response']
 
     def apply(self, risk_id, repo):
         '''
@@ -207,10 +209,10 @@ class RecastRiskAPI(SCEndpoint):
         Examples:
             >>> sc.recast_risks.apply(1)
         '''
-        return self._api.post('recastRiskRule/{}/apply'.format(
-            self._check('risk_id', risk_id, int)), json={
-            'repository': {'id': self._check('repo', repo, int)}
-        }).json()['response']
+        return self._api.post(
+            f"recastRiskRule/{self._check('risk_id', risk_id, int)}/apply",
+            json={'repository': {'id': self._check('repo', repo, int)}},
+        ).json()['response']
 
     def create(self, plugin_id, repos, severity_id, **kwargs):
         '''

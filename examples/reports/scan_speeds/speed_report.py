@@ -14,10 +14,7 @@ def run(report):
         if v['pluginID'] == 19506:
             res = redur.findall(v['plugin_output'])
             if len(res) > 0:
-                print('{} Took {} seconds to complete.'.format(
-                    v['host-ip'],
-                    res[0]
-                ))
+                print(f"{v['host-ip']} Took {res[0]} seconds to complete.")
 
 if __name__ == '__main__':
     run()

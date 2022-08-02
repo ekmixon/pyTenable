@@ -28,7 +28,7 @@ class FiltersAPI(TIOEndpoint):
         '''
         Converts the filters into an easily pars-able dictionary
         '''
-        filters = dict()
+        filters = {}
         for item in filterset:
             datablock = {
                 'operators': item['operators'],
@@ -59,10 +59,7 @@ class FiltersAPI(TIOEndpoint):
         if name not in self._cache:
             self._cache[name] = self._api.get(path).json()[field_name]
 
-        if normalize:
-            return self._normalize(self._cache[name])
-
-        return self._cache[name]
+        return self._normalize(self._cache[name]) if normalize else self._cache[name]
 
     def access_group_asset_rules_filters(self, normalize=True):
         '''

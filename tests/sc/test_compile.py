@@ -69,13 +69,10 @@ def test_sc_compile(security_center):
         UserAPI(security_center)
 
     except NameError as error:
-        print("\n The following name error exists: {}".format(error))
+        print(f"\n The following name error exists: {error}")
         pytest.raises(NameError)
-        assert True
     except ConnectionError as error:
-        print("\n The following connection error exists: {}".format(error))
+        print(f"\n The following connection error exists: {error}")
         pytest.raises(ConnectionError)
-        assert True
     except TypeError as error:
-        print("\n The following type error exists: {}".format(error))
-        assert True
+        print(f"\n The following type error exists: {error}")

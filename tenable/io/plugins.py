@@ -59,10 +59,7 @@ class PluginIterator(TIOIterator):
             can focus on reducing this time later on with the introduction of
             multi-threaded iterators && async API calls.
         '''
-        self._maptable = {
-            'plugins': dict(),
-            'families': dict()
-        }
+        self._maptable = {'plugins': {}, 'families': {}}
         for family in self._api.plugins.families():
             self._maptable['families'][family['id']] = family['name']
 
@@ -85,7 +82,7 @@ class PluginIterator(TIOIterator):
                 item['family_id'] = fid
                 item['family_name'] = self._maptable['families'][fid]
             except KeyError:
-                self._log.warning("plugin id {} not found in plugin family".format(item['id']))
+                self._log.warning(f"plugin id {item['id']} not found in plugin family")
                 item['family_id'] = None
                 item['family_name'] = None
 
@@ -130,9 +127,9 @@ class PluginsAPI(TIOEndpoint):
         Examples:
             >>> family = tio.plugins.family_details(1)
         '''
-        return self._api.get('plugins/families/{}'.format(
-            self._check('family_id', family_id, int)
-        )).json()
+        return self._api.get(
+            f"plugins/families/{self._check('family_id', family_id, int)}"
+        ).json()
 
     def plugin_details(self, plugin_id):
         '''
@@ -152,8 +149,9 @@ class PluginsAPI(TIOEndpoint):
             >>> plugin = tio.plugins.plugin_details(19506)
             >>> pprint(plugin)
         '''
-        return self._api.get('plugins/plugin/{}'.format(
-            self._check('plugin_id', plugin_id, int))).json()
+        return self._api.get(
+            f"plugins/plugin/{self._check('plugin_id', plugin_id, int)}"
+        ).json()
 
     def list(self, page=None, size=None, last_updated=None, num_pages=None):
         '''

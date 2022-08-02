@@ -22,7 +22,6 @@ def fixture_group(request, api):
             api.groups.delete(group['id'])
         except NotFoundError as err:
             log_exception(err)
-            pass
 
     request.addfinalizer(teardown)
     return group

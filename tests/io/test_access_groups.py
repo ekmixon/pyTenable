@@ -28,7 +28,6 @@ def fixture_agroup(request, api, rules):
             api.access_groups.delete(group['id'])
         except APIError as err:
             log_exception(err)
-            pass
 
     request.addfinalizer(teardown)
     return group

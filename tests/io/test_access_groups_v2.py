@@ -33,7 +33,6 @@ def fixture_agroup(request, api, vcr, rules):
                 api.access_groups_v2.delete(group['id'])
         except APIError as api_exception:
             log_exception(api_exception)
-            pass
 
     request.addfinalizer(teardown)
     return group

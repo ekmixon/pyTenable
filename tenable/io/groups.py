@@ -82,7 +82,7 @@ class GroupsAPI(TIOEndpoint):
         Examples:
             >>> tio.groups.delete(1)
         '''
-        self._api.delete('groups/{}'.format(self._check('id', id, int)))
+        self._api.delete(f"groups/{self._check('id', id, int)}")
 
     def delete_user(self, group_id, user_id):
         '''
@@ -103,10 +103,9 @@ class GroupsAPI(TIOEndpoint):
         Examples:
             >>> tio.groups.delete_user(1, 1)
         '''
-        self._api.delete('groups/{}/users/{}'.format(
-            self._check('group_id', group_id, int),
-            self._check('user_id', user_id, int)
-        ))
+        self._api.delete(
+            f"groups/{self._check('group_id', group_id, int)}/users/{self._check('user_id', user_id, int)}"
+        )
 
     def edit(self, id, name):
         '''
@@ -127,8 +126,10 @@ class GroupsAPI(TIOEndpoint):
         Examples:
             >>> tio.groups.edit(1, 'Updated name')
         '''
-        return self._api.put('groups/{}'.format(self._check('id', id, int)),
-            json={'name': self._check('name', name, str)}).json()
+        return self._api.put(
+            f"groups/{self._check('id', id, int)}",
+            json={'name': self._check('name', name, str)},
+        ).json()
 
     def list(self):
         '''
@@ -164,6 +165,7 @@ class GroupsAPI(TIOEndpoint):
             >>> for user in tio.groups.list_users(1):
             ...     pprint(user)
         '''
-        return self._api.get('groups/{}/users'.format(
-            self._check('id', id, int))).json()['users']
+        return self._api.get(f"groups/{self._check('id', id, int)}/users").json()[
+            'users'
+        ]
 

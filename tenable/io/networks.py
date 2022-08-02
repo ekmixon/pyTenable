@@ -91,7 +91,7 @@ class NetworksAPI(TIOEndpoint):
         Examples:
             >>> tio.networks.delete('00000000-0000-0000-0000-000000000000')
         '''
-        self._api.delete('networks/{}'.format(self._check('network_id', network_id, 'uuid')))
+        self._api.delete(f"networks/{self._check('network_id', network_id, 'uuid')}")
 
     def details(self, network_id):
         '''
@@ -105,8 +105,9 @@ class NetworksAPI(TIOEndpoint):
         Examples:
             >>> nw = tio.networks.details('00000000-0000-0000-0000-000000000000')
         '''
-        return self._api.get('networks/{}'.format(
-            self._check('network_id', network_id, 'uuid'))).json()
+        return self._api.get(
+            f"networks/{self._check('network_id', network_id, 'uuid')}"
+        ).json()
 
     def edit(self, network_id, name, description=None, assets_ttl_days=None):
         '''
@@ -135,12 +136,16 @@ class NetworksAPI(TIOEndpoint):
         if not description:
             description = ''
 
-        return self._api.put('networks/{}'.format(self._check('network_id', network_id, 'uuid')),
+        return self._api.put(
+            f"networks/{self._check('network_id', network_id, 'uuid')}",
             json={
                 'name': self._check('name', name, str),
                 'description': self._check('description', description, str),
-                'assets_ttl_days': self._check('assets_ttl_days', assets_ttl_days, int)
-            }).json()
+                'assets_ttl_days': self._check(
+                    'assets_ttl_days', assets_ttl_days, int
+                ),
+            },
+        ).json()
 
     def assign_scanners(self, network_id, *scanner_uuids):
         '''
@@ -168,15 +173,21 @@ class NetworksAPI(TIOEndpoint):
             ...     '00000000-0000-0000-0000-000000000000') # Scanner2 UUID
         '''
         if len(scanner_uuids) == 1:
-            self._api.post('networks/{}/scanners/{}'.format(
-                self._check('network_id', network_id, 'uuid'),
-                self._check('scanner_uuid', scanner_uuids[0], 'scanner-uuid')
-            ))
+            self._api.post(
+                f"networks/{self._check('network_id', network_id, 'uuid')}/scanners/{self._check('scanner_uuid', scanner_uuids[0], 'scanner-uuid')}"
+            )
+
         elif len(scanner_uuids) > 1:
-            self._api.post('networks/{}/scanners'.format(
-                self._check('network_id', network_id, 'uuid')),
-                    json={'scanner_uuids': [self._check('scanner_uuid', i, 'scanner-uuid')
-                        for i in scanner_uuids]})
+            self._api.post(
+                f"networks/{self._check('network_id', network_id, 'uuid')}/scanners",
+                json={
+                    'scanner_uuids': [
+                        self._check('scanner_uuid', i, 'scanner-uuid')
+                        for i in scanner_uuids
+                    ]
+                },
+            )
+
         else:
             raise UnexpectedValueError('No scanner_uuids were supplied.')
 
@@ -198,8 +209,9 @@ class NetworksAPI(TIOEndpoint):
             >>> for scanner in tio.networks.list_scanners(network):
             ...     pprint(scanner)
         '''
-        return self._api.get('networks/{}/scanners'.format(
-            self._check('network_id', network_id, 'uuid'))).json()['scanners']
+        return self._api.get(
+            f"networks/{self._check('network_id', network_id, 'uuid')}/scanners"
+        ).json()['scanners']
 
     def unassigned_scanners(self, network_id):
         '''
@@ -221,8 +233,9 @@ class NetworksAPI(TIOEndpoint):
             >>> for scanner in tio.networks.unassigned_scanners(network):
             ...     pprint(scanner)
         '''
-        return self._api.get('networks/{}/assignable-scanners'.format(
-            self._check('network_id', network_id, 'uuid'))).json()['scanners']
+        return self._api.get(
+            f"networks/{self._check('network_id', network_id, 'uuid')}/assignable-scanners"
+        ).json()['scanners']
 
     def list(self, *filters, **kw):
         '''
@@ -367,6 +380,6 @@ class NetworksAPI(TIOEndpoint):
             >>> network = '00000000-0000-0000-0000-000000000000'
             >>> count = tio.networks.network_asset_count(network, 180)
         '''
-        return self._api.get('networks/{}/counts/assets-not-seen-in/{}'.format(
-            self._check('network_id', network_id, 'uuid'),
-            self._check('num_days', num_days, int))).json()
+        return self._api.get(
+            f"networks/{self._check('network_id', network_id, 'uuid')}/counts/assets-not-seen-in/{self._check('num_days', num_days, int)}"
+        ).json()

@@ -16,14 +16,17 @@ def test_iterator(fixture_ot):
     )
 
     # iterate through multiple pages
-    items = OTIterator(fixture_ot, path='iterator_test', payload=dict(), limit=6, max_pages=3)
+    items = OTIterator(
+        fixture_ot, path='iterator_test', payload={}, limit=6, max_pages=3
+    )
+
     for item in items:
         assert isinstance(item, str)
     assert items.count == 18
     assert items.num_pages == 3
 
     # insure that the iterator will bail when the limit is larger than the page.
-    items = OTIterator(fixture_ot, path='iterator_test', payload=dict(), max_pages=3)
+    items = OTIterator(fixture_ot, path='iterator_test', payload={}, max_pages=3)
     for item in items:
         assert isinstance(item, str)
     assert items.count == 6

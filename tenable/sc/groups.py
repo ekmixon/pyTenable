@@ -48,8 +48,11 @@ class GroupAPI(SCEndpoint):
                 # into a list of dictionaries with an id attribute.  Associate
                 # the expanded list to the value of the hash table and delete
                 # the original kwarg.
-                kw[v] = [{'id': self._check('{}:item'.format(k), i, int)}
-                    for i in self._check(k, kw[k], list)]
+                kw[v] = [
+                    {'id': self._check(f'{k}:item', i, int)}
+                    for i in self._check(k, kw[k], list)
+                ]
+
                 del(kw[k])
         return kw
 
@@ -112,12 +115,13 @@ class GroupAPI(SCEndpoint):
             >>> group = sc.groups.details(1)
             >>> pprint(group)
         '''
-        params = dict()
+        params = {}
         if fields:
             params['fields'] = ','.join([self._check('field', f, str) for f in fields])
 
-        return self._api.get('group/{}'.format(self._check('id', id, int)),
-            params=params).json()['response']
+        return self._api.get(
+            f"group/{self._check('id', id, int)}", params=params
+        ).json()['response']
 
     def edit(self, id, **kw):
         '''
@@ -158,8 +162,9 @@ class GroupAPI(SCEndpoint):
             >>> group = sc.groups.edit()
         '''
         payload = self._constructor(**kw)
-        return self._api.patch('group/{}'.format(
-            self._check('id', id, int)), json=payload).json()['response']
+        return self._api.patch(
+            f"group/{self._check('id', id, int)}", json=payload
+        ).json()['response']
 
     def delete(self, id):
         '''
@@ -177,8 +182,9 @@ class GroupAPI(SCEndpoint):
         Examples:
             >>> sc.groups.delete(1)
         '''
-        return self._api.delete('group/{}'.format(
-            self._check('id', id, int))).json()['response']
+        return self._api.delete(f"group/{self._check('id', id, int)}").json()[
+            'response'
+        ]
 
     def list(self, fields=None):
         '''
@@ -198,7 +204,7 @@ class GroupAPI(SCEndpoint):
             >>> for group in sc.groups.list():
             ...     pprint(group)
         '''
-        params = dict()
+        params = {}
         if fields:
             params['fields'] = ','.join([self._check('field', f, str)
                 for f in fields])

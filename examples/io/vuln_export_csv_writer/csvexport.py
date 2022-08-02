@@ -111,15 +111,15 @@ def cli(output, akey, skey, sevs, last_found, cidr, tags, fields, verbose):
         logging.basicConfig(level=logging.INFO)
     if verbose > 1:
         logging.basicConfig(level=logging.DEBUG)
-    
+
     # Instantiate the Tenable.io instance & initiate the vulnerability export.
     tio = TenableIO(akey, skey)
     vulns = tio.exports.vulns(last_found=last_found, severity=list(sevs), 
         cidr_range=cidr, tags=list(tags))
-    
+
     # Pass everything to the CSV generator.
     total = export_vulns_to_csv(output, vulns, *fields)
-    click.echo('Processed {} Vulnerabilities'.format(total))
+    click.echo(f'Processed {total} Vulnerabilities')
 
 
 if __name__ == '__main__':

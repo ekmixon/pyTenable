@@ -70,9 +70,9 @@ class AgentConfigAPI(TIOEndpoint):
 
         # Now to run the API call and get the response
         return self._api.put(
-            'scanners/{}/agents/config'.format(
-                self._check('scanner_id', scanner_id, int)
-            ), json=payload).json()
+            f"scanners/{self._check('scanner_id', scanner_id, int)}/agents/config",
+            json=payload,
+        ).json()
 
     def details(self, scanner_id=1):
         '''
@@ -94,6 +94,5 @@ class AgentConfigAPI(TIOEndpoint):
         if not scanner_id:
             scanner_id = 1
         return self._api.get(
-            'scanners/{}/agents/config'.format(
-                self._check('scanner_id', scanner_id, int)
-            )).json()
+            f"scanners/{self._check('scanner_id', scanner_id, int)}/agents/config"
+        ).json()

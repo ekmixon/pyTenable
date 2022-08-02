@@ -38,25 +38,20 @@ def download_scans(access_key, secret_key, search, path, filters, **kwargs):
     for scan in scans:
         details = tio.scans.results(scan['id'])
 
-        # get the list of scan histories that are in a completed state.
-        completed = [h for h in details.get('history', list())
-                        if h.get('status') == 'completed']
-
-        # download the latest completed scan using the scan name && history id
-        # and store the file in the path specified using the filename format:
-        # {SCAN_NAME}-{HISTORY_ID}.{FORMAT}
-        if len(completed) > 0:
+        if completed := [
+            h
+            for h in details.get('history', [])
+            if h.get('status') == 'completed'
+        ]:
             history = completed[0]
-            with open(os.path.join(path, '{}-{}.{}'.format(
-              scan['name'].replace(' ', '_'),
-              history['uuid'],
-              kwargs['format'])), 'wb') as report_file:
+            with open(os.path.join(path, f"{scan['name'].replace(' ', '_')}-{history['uuid']}.{kwargs['format']}"), 'wb') as report_file:
                 kw = kwargs
                 kw['history_id'] = history['history_id']
                 kw['fobj'] = report_file
-                click.echo('Scan completed at {} downloading to {}'.format(
-                    arrow.get(history['last_modification_date']).isoformat(),
-                    report_file.name))
+                click.echo(
+                    f"Scan completed at {arrow.get(history['last_modification_date']).isoformat()} downloading to {report_file.name}"
+                )
+
                 tio.scans.export(scan['id'], *filters, **kw)
 
 if __name__ == '__main__':

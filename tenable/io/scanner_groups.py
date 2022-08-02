@@ -44,10 +44,9 @@ class ScannerGroupsAPI(TIOEndpoint):
         Examples:
             >>> tio.scanner_groups.add_scanner(1, 1)
         '''
-        self._api.post('scanner-groups/{}/scanners/{}'.format(
-            self._check('group_id', group_id, int),
-            self._check('scanner_id', scanner_id, int)
-        ))
+        self._api.post(
+            f"scanner-groups/{self._check('group_id', group_id, int)}/scanners/{self._check('scanner_id', scanner_id, int)}"
+        )
 
     def create(self, name, group_type=None):
         '''
@@ -90,7 +89,7 @@ class ScannerGroupsAPI(TIOEndpoint):
         Examples:
             >>> tio.scanner_groups.delete(1)
         '''
-        self._api.delete('scanner-groups/{}'.format(self._check('group_id', group_id, int)))
+        self._api.delete(f"scanner-groups/{self._check('group_id', group_id, int)}")
 
     def delete_scanner(self, group_id, scanner_id):
         '''
@@ -112,10 +111,9 @@ class ScannerGroupsAPI(TIOEndpoint):
         Examples:
             >>> tio.scanner_groups.delete_scanner(1, 1)
         '''
-        self._api.delete('scanner-groups/{}/scanners/{}'.format(
-            self._check('group_id', group_id, int),
-            self._check('scanner_id', scanner_id, int)
-        ))
+        self._api.delete(
+            f"scanner-groups/{self._check('group_id', group_id, int)}/scanners/{self._check('scanner_id', scanner_id, int)}"
+        )
 
     def details(self, group_id):
         '''
@@ -134,8 +132,9 @@ class ScannerGroupsAPI(TIOEndpoint):
             >>> group = tio.scanner_groups.details(1)
             >>> pprint(group)
         '''
-        return self._api.get('scanner-groups/{}'.format(
-            self._check('group_id', group_id, int))).json()
+        return self._api.get(
+            f"scanner-groups/{self._check('group_id', group_id, int)}"
+        ).json()
 
     def edit(self, group_id, name):
         '''
@@ -154,10 +153,10 @@ class ScannerGroupsAPI(TIOEndpoint):
         Examples:
             >>> tio.scanner_groups.edit(1, 'New Group Name')
         '''
-        self._api.put('scanner-groups/{}'.format(
-            self._check('group_id', group_id, int)), json={
-                'name': self._check('name', name, str)
-        })
+        self._api.put(
+            f"scanner-groups/{self._check('group_id', group_id, int)}",
+            json={'name': self._check('name', name, str)},
+        )
 
     def list(self):
         '''
@@ -192,8 +191,9 @@ class ScannerGroupsAPI(TIOEndpoint):
             >>> for scanner in tio.scanner_groups.list_scanners(1):
             ...     pprint(scanner)
         '''
-        return self._api.get('scanner-groups/{}/scanners'.format(
-            self._check('group_id', group_id, int))).json()['scanners']
+        return self._api.get(
+            f"scanner-groups/{self._check('group_id', group_id, int)}/scanners"
+        ).json()['scanners']
 
     def list_routes(self, group_id):
         '''
@@ -213,8 +213,9 @@ class ScannerGroupsAPI(TIOEndpoint):
             >>> for scanner in tio.scanner_groups.list_routes(1):
             ...     pprint(scanner)
         '''
-        return self._api.get('scanner-groups/{}/routes'.format(
-            self._check('group_id', group_id, int))).json()
+        return self._api.get(
+            f"scanner-groups/{self._check('group_id', group_id, int)}/routes"
+        ).json()
 
     def edit_routes(self, group_id, routes):
         '''
@@ -236,5 +237,7 @@ class ScannerGroupsAPI(TIOEndpoint):
         '''
         payload = {'routes': self._check('routes', routes, list)}
 
-        self._api.put('scanner-groups/{}/routes'.format(
-            self._check('group_id', group_id, int)), json=payload)
+        self._api.put(
+            f"scanner-groups/{self._check('group_id', group_id, int)}/routes",
+            json=payload,
+        )

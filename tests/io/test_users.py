@@ -10,13 +10,13 @@ def guser():
     '''
     Returns username
     '''
-    return '{}@tenable.com'.format(uuid.uuid4())
+    return f'{uuid.uuid4()}@tenable.com'
 
 def gpass():
     '''
     Returns password
     '''
-    return '{}Tt!'.format(uuid.uuid4())
+    return f'{uuid.uuid4()}Tt!'
 
 @pytest.mark.vcr()
 def test_users_create_username_typeerror(api):

@@ -195,12 +195,13 @@ class AuditFileAPI(SCEndpoint):
             >>> audit = sc.audit_files.details(1)
             >>> pprint(audit)
         '''
-        params = dict()
+        params = {}
         if fields:
             params['fields'] = ','.join([self._check('field', f, str) for f in fields])
 
-        return self._api.get('auditFile/{}'.format(self._check('id', id, int)),
-            params=params).json()['response']
+        return self._api.get(
+            f"auditFile/{self._check('id', id, int)}", params=params
+        ).json()['response']
 
     def edit(self, id, audit_file=None, tailoring_file=None, **kw):
         '''
@@ -269,8 +270,9 @@ class AuditFileAPI(SCEndpoint):
             kw['tailoring_filename'] = self._api.files.upload(tailoring_file)
 
         payload = self._constructor(**kw)
-        return self._api.patch('auditFile/{}'.format(
-            self._check('id', id, int)), json=payload).json()['response']
+        return self._api.patch(
+            f"auditFile/{self._check('id', id, int)}", json=payload
+        ).json()['response']
 
     def delete(self, id):
         '''
@@ -288,8 +290,9 @@ class AuditFileAPI(SCEndpoint):
         Examples:
             >>> sc.audit_files.delete(1)
         '''
-        return self._api.delete('auditFile/{}'.format(
-            self._check('id', id, int))).json()['response']
+        return self._api.delete(f"auditFile/{self._check('id', id, int)}").json()[
+            'response'
+        ]
 
     def list(self, fields=None):
         '''
@@ -309,7 +312,7 @@ class AuditFileAPI(SCEndpoint):
             >>> for audit in sc.audit_files.list():
             ...     pprint(audit)
         '''
-        params = dict()
+        params = {}
         if fields:
             params['fields'] = ','.join([self._check('field', f, str)
                 for f in fields])
@@ -340,8 +343,10 @@ class AuditFileAPI(SCEndpoint):
             >>> with open('example.zip', 'wb') as fobj:
             ...     sc.audit_files.export_audit(1, fobj)
         '''
-        resp = self._api.get('auditFile/{}/export'.format(
-            self._check('id', id, int)), stream=True)
+        resp = self._api.get(
+            f"auditFile/{self._check('id', id, int)}/export", stream=True
+        )
+
 
         # if no file-like object was passed, then we will instantiate a BytesIO
         # object to push the file into.
@@ -391,13 +396,14 @@ class AuditFileAPI(SCEndpoint):
         Examples:
             >>> tmpl = sc.audit_files.template_details(1)
         '''
-        params = dict()
+        params = {}
         if fields:
             params['fields'] = ','.join([self._check('field', f, str)
                 for f in fields])
 
-        return self._api.get('auditFileTemplate/{}'.format(
-            self._check('id', id, int)), params=params).json()['response']
+        return self._api.get(
+            f"auditFileTemplate/{self._check('id', id, int)}", params=params
+        ).json()['response']
 
     def template_list(self, category=None, search=None, fields=None):
         '''
@@ -422,7 +428,7 @@ class AuditFileAPI(SCEndpoint):
             >>> for tmpl in sc.audit_files.template_list():
             ...     pprint(tmpl)
         '''
-        params = dict()
+        params = {}
 
         if category:
             params['categoryID'] = self._check('category', category, int)

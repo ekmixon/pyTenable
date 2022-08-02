@@ -30,7 +30,7 @@ class EditorAPI(TIOEndpoint):
         Walks through the credential data list and returns the configured
         settings for a given scan policy/scan
         '''
-        resp = dict()
+        resp = {}
         for dtype in data:
             for item in dtype['types']:
                 if len(item['instances']) > 0:
@@ -42,12 +42,12 @@ class EditorAPI(TIOEndpoint):
 
                         if dtype['name'] not in resp:
                             # if the Datatype doesn't exist yet, create it.
-                            resp[dtype['name']] = dict()
+                            resp[dtype['name']] = {}
 
                         if item['name'] not in resp[dtype['name']]:
                             # if the data subtype doesn't exist yet,
                             # create it.
-                            resp[dtype['name']][item['name']] = list()
+                            resp[dtype['name']][item['name']] = []
 
                         # Add the configured settings to the key-value
                         # dictionary
@@ -59,10 +59,7 @@ class EditorAPI(TIOEndpoint):
         Walks through the compliance data list and returns the configured
         settings for a given policy/scan
         '''
-        resp = {
-            'custom': list(),
-            'feed': dict()
-        }
+        resp = {'custom': [], 'feed': {}}
 
         for atype in data:
             for audit in atype['audits']:
@@ -86,7 +83,7 @@ class EditorAPI(TIOEndpoint):
                         # variables with the set values and store them in
                         # the variables dictionary.
                         if atype['name'] not in resp['feed']:
-                            resp['feed'][atype['name']] = list()
+                            resp['feed'][atype['name']] = []
                         resp['feed'][atype['name']].append({
                             'id': audit['id'],
                             'variables': policy_settings(audit)
@@ -98,7 +95,7 @@ class EditorAPI(TIOEndpoint):
         Walks through the plugin settings and will return the the configured
         settings for a given scan/policy
         '''
-        resp = dict()
+        resp = {}
 
         for family in families:
             if families[family]['status'] != 'mixed':
@@ -106,17 +103,9 @@ class EditorAPI(TIOEndpoint):
                 # all we need to set is the status.
                 resp[family] = {'status': families[family]['status']}
             else:
-                # if the plugin family is set to mixed, we will need to get
-                # the currently enabled status of every plugin within the
-                # mixed families.  To do so, we will need to query the
-                # scan editor for each mixed family, getting the plugin
-                # listing w/ status an interpreting that into a simple
-                # dictionary of plugin_id:status.
-                plugins = dict()
                 plugs = self._api.get(callfmt.format(
                     etype=etype, id=id, fam=families[family]['id'])).json()['plugins']
-                for plugin in plugs:
-                    plugins[plugin['id']] = plugin['status']
+                plugins = {plugin['id']: plugin['status'] for plugin in plugs}
                 resp[family] = {
                     'mixedDefault': 'enabled',
                     'status': 'mixed',
@@ -252,11 +241,8 @@ class EditorAPI(TIOEndpoint):
                 Details of the plugin requested.
         '''
         return self._api.get(
-            'editor/policy/{}/families/{}/plugins/{}'.format(
-                self._check('policy_id', policy_id, int),
-                self._check('family_id', family_id, int),
-                self._check('plugin_id', plugin_id, int)
-            )).json()['plugindescription']
+            f"editor/policy/{self._check('policy_id', policy_id, int)}/families/{self._check('family_id', family_id, int)}/plugins/{self._check('plugin_id', plugin_id, int)}"
+        ).json()['plugindescription']
 
     def details(self, etype, id):
         '''
@@ -346,7 +332,7 @@ class EditorAPI(TIOEndpoint):
         # Clean out the empty attributes for templates:
         if etype == 'scan/policy':
             for key in list(obj['settings'].keys()):
-                if obj['settings'][key] == None:
+                if obj['settings'][key] is None:
                     del(obj['settings'][key])
 
         # return the scan document to the caller.

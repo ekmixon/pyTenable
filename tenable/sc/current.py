@@ -51,7 +51,7 @@ class CurrentSessionAPI(SCEndpoint):
         Examples:
             >>> org = sc.current.org()
         '''
-        params = dict()
+        params = {}
         if fields:
             params['fields'] = ','.join([self._check('field', f, str)
                                          for f in fields])
@@ -75,7 +75,7 @@ class CurrentSessionAPI(SCEndpoint):
         Examples:
             >>> user = sc.current.user()
         '''
-        params = dict()
+        params = {}
         if fields:
             params['fields'] = ','.join([self._check('field', f, str)
                                          for f in fields])

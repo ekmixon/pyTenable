@@ -1,5 +1,7 @@
 from datetime import datetime, timedelta
 
+
+
 class IOConstants:
     '''
     This class contains all the constants related to IO package
@@ -9,6 +11,8 @@ class IOConstants:
         # for case parameter in check
         uppercase = 'upper'
         lowecase = 'lower'
+
+
 
     class ScheduleConst:
         '''
@@ -33,7 +37,7 @@ class IOConstants:
         # frequency-MONTHLY
         day_of_month = 'day_of_month'
         day_of_month_choice = list(range(1, 32))
-        day_of_month_default = datetime.today().day
+        day_of_month_default = datetime.now().day
 
         # INTERVAL
         interval = 'interval'
@@ -53,6 +57,7 @@ class IOConstants:
 
         # rrule
         rrules = 'rrules'
+
 
     class ScanScheduleConst(ScheduleConst):
         '''

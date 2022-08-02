@@ -32,7 +32,7 @@ class AlertAPI(SCEndpoint):
         '''
 
         # call the analysis query constructor to assemble a query.
-        if len(filters) > 0:
+        if filters:
             # checking to see if data_type was passed.  If it wasn't then we
             # will set the value to the default of 'vuln'.
             if 'data_type' not in kw:
@@ -105,7 +105,7 @@ class AlertAPI(SCEndpoint):
             >>> for alert in sc.alerts.list()['manageable']:
             ...     pprint(alert)
         '''
-        params = dict()
+        params = {}
         if fields:
             params['fields'] = ','.join([self._check('field', f, str)
                 for f in fields])
@@ -130,12 +130,13 @@ class AlertAPI(SCEndpoint):
             >>> alert = sc.alerts.detail(1)
             >>> pprint(alert)
         '''
-        params = dict()
+        params = {}
         if fields:
             params['fields'] = ','.join([self._check('field', f, str) for f in fields])
 
-        return self._api.get('alert/{}'.format(self._check('id', id, int)),
-            params=params).json()['response']
+        return self._api.get(
+            f"alert/{self._check('id', id, int)}", params=params
+        ).json()['response']
 
     def create(self, *filters, **kw):
         '''
@@ -292,8 +293,9 @@ class AlertAPI(SCEndpoint):
             >>> sc.alerts.update(1, name='New Alert Name')
         '''
         payload = self._constructor(*filters, **kw)
-        return self._api.patch('alert/{}'.format(
-            self._check('id', id, int)), json=payload).json()['response']
+        return self._api.patch(
+            f"alert/{self._check('id', id, int)}", json=payload
+        ).json()['response']
 
     def delete(self, id):
         '''
@@ -311,8 +313,9 @@ class AlertAPI(SCEndpoint):
         Examples:
             >>> sc.alerts.delete(1)
         '''
-        return self._api.delete('alert/{}'.format(
-            self._check('id', id, int))).json()['response']
+        return self._api.delete(f"alert/{self._check('id', id, int)}").json()[
+            'response'
+        ]
 
     def execute(self, id):
         '''
@@ -327,5 +330,6 @@ class AlertAPI(SCEndpoint):
             :obj:`dict`:
                 The alert resource.
         '''
-        return self._api.post('alert/{}/execute'.format(
-            self._check('id', id, int))).json()['response']
+        return self._api.post(
+            f"alert/{self._check('id', id, int)}/execute"
+        ).json()['response']

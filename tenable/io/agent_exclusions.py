@@ -139,9 +139,14 @@ class AgentExclusionsAPI(TIOEndpoint):
         # if the frequency is monthly, then we will need to specify the day of
         # the month that the rule will run on.
         if frequency == 'MONTHLY':
-            rrules['bymonthday'] = self._check('day_of_month', day_of_month, int,
-                choices=list(range(1,32)),
-                default=datetime.today().day)
+            rrules['bymonthday'] = self._check(
+                'day_of_month',
+                day_of_month,
+                int,
+                choices=list(range(1, 32)),
+                default=datetime.now().day,
+            )
+
 
         # Next we need to construct the rest of the payload
         payload = {
@@ -164,9 +169,9 @@ class AgentExclusionsAPI(TIOEndpoint):
         # documentation requests and if we don't raise an error, then lets make
         # the call.
         return self._api.post(
-            'scanners/{}/agents/exclusions'.format(
-                self._check('scanner_id', scanner_id, int)
-            ), json=payload).json()
+            f"scanners/{self._check('scanner_id', scanner_id, int)}/agents/exclusions",
+            json=payload,
+        ).json()
 
     def delete(self, exclusion_id, scanner_id=1):
         '''
@@ -184,10 +189,9 @@ class AgentExclusionsAPI(TIOEndpoint):
         Examples:
             >>> tio.agent_exclusions.delete(1)
         '''
-        self._api.delete('scanners/{}/agents/exclusions/{}'.format(
-            self._check('scanner_id', scanner_id, int),
-            self._check('exclusion_id', exclusion_id, int)
-        ))
+        self._api.delete(
+            f"scanners/{self._check('scanner_id', scanner_id, int)}/agents/exclusions/{self._check('exclusion_id', exclusion_id, int)}"
+        )
 
     def details(self, exclusion_id, scanner_id=1):
         '''
@@ -206,10 +210,8 @@ class AgentExclusionsAPI(TIOEndpoint):
             >>> exclusion = tio.agent_exclusions.details(1)
         '''
         return self._api.get(
-            'scanners/{}/agents/exclusions/{}'.format(
-                self._check('scanner_id', scanner_id, int),
-                self._check('exclusion_id', exclusion_id, int)
-            )).json()
+            f"scanners/{self._check('scanner_id', scanner_id, int)}/agents/exclusions/{self._check('exclusion_id', exclusion_id, int)}"
+        ).json()
 
     def edit(self, exclusion_id, scanner_id=1, name=None, start_time=None,
             end_time=None, timezone=None, description=None, frequency=None,
@@ -300,8 +302,15 @@ class AgentExclusionsAPI(TIOEndpoint):
 
             if frequency == 'MONTHLY':
                 rrules['bymonthday'] = self._check(
-                    'day_of_month', day_of_month, int, choices=list(range(1, 32)),
-                    default=payload['schedule']['rrules'].get('bymonthday', datetime.today().day))
+                    'day_of_month',
+                    day_of_month,
+                    int,
+                    choices=list(range(1, 32)),
+                    default=payload['schedule']['rrules'].get(
+                        'bymonthday', datetime.now().day
+                    ),
+                )
+
 
             # update new rrules in existing payload
             dict_merge(payload['schedule']['rrules'], rrules)
@@ -328,10 +337,9 @@ class AgentExclusionsAPI(TIOEndpoint):
         # integers as the API documentation requests and if we don't raise an
         # error, then lets make the call.
         return self._api.put(
-            'scanners/{}/agents/exclusions/{}'.format(
-                self._check('scanner_id', scanner_id, int),
-                self._check('exclusion_id', exclusion_id, int)
-        ), json=payload).json()
+            f"scanners/{self._check('scanner_id', scanner_id, int)}/agents/exclusions/{self._check('exclusion_id', exclusion_id, int)}",
+            json=payload,
+        ).json()
 
     def list(self, scanner_id=1):
         '''
@@ -350,6 +358,5 @@ class AgentExclusionsAPI(TIOEndpoint):
             ...     pprint(exclusion)
         '''
         return self._api.get(
-            'scanners/{}/agents/exclusions'.format(
-                self._check('scanner_id', scanner_id, int)
-            )).json()['exclusions']
+            f"scanners/{self._check('scanner_id', scanner_id, int)}/agents/exclusions"
+        ).json()['exclusions']

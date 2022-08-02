@@ -66,7 +66,7 @@ class RoleAPI(SCEndpoint):
 
         # iterate through the keys, converting the boolean values to the
         # lowercased strings values that the API expects to see.
-        for key in mapping.keys():
+        for key in mapping:
             if key in kw:
                 kw[mapping[key]] = str(self._check(key, kw[key], bool)).lower()
                 del(kw[key])
@@ -173,12 +173,13 @@ class RoleAPI(SCEndpoint):
             >>> role = sc.roles.details(1)
             >>> pprint(role)
         '''
-        params = dict()
+        params = {}
         if fields:
             params['fields'] = ','.join([self._check('field', f, str) for f in fields])
 
-        return self._api.get('role/{}'.format(self._check('id', id, int)),
-            params=params).json()['response']
+        return self._api.get(
+            f"role/{self._check('id', id, int)}", params=params
+        ).json()['response']
 
     def edit(self, id, **kw):
         '''
@@ -259,8 +260,9 @@ class RoleAPI(SCEndpoint):
             >>> role = sc.roles.create()
         '''
         payload = self._constructor(**kw)
-        return self._api.patch('role/{}'.format(
-            self._check('id', id, int)), json=payload).json()['response']
+        return self._api.patch(
+            f"role/{self._check('id', id, int)}", json=payload
+        ).json()['response']
 
     def delete(self, id):
         '''
@@ -278,8 +280,9 @@ class RoleAPI(SCEndpoint):
         Examples:
             >>> sc.roles.delete(1)
         '''
-        return self._api.delete('role/{}'.format(
-            self._check('id', id, int))).json()['response']
+        return self._api.delete(f"role/{self._check('id', id, int)}").json()[
+            'response'
+        ]
 
 
     def list(self, fields=None):
@@ -300,7 +303,7 @@ class RoleAPI(SCEndpoint):
             >>> for role in sc.roles.list():
             ...     pprint(role)
         '''
-        params = dict()
+        params = {}
         if fields:
             params['fields'] = ','.join([self._check('field', f, str)
                 for f in fields])

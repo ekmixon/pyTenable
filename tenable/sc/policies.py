@@ -53,9 +53,8 @@ class ScanPolicyAPI(SCEndpoint):
         if 'preferences' in kw:
             # Validate that all of the preferences are K:V pairs of strings.
             for key in self._check('preferences', kw['preferences'], dict):
-                self._check('preference:{}'.format(key), key, str)
-                self._check('preference:{}:value'.format(key),
-                    kw['preferences'][key], str)
+                self._check(f'preference:{key}', key, str)
+                self._check(f'preference:{key}:value', kw['preferences'][key], str)
 
         if 'audit_files' in kw:
             # unflatten the audit_files list into a list of dictionaries.
@@ -111,7 +110,7 @@ class ScanPolicyAPI(SCEndpoint):
             >>> for policy in templates:
             ...     pprint(policy)
         '''
-        params = dict()
+        params = {}
         if fields:
             params['fields'] = ','.join([self._check('field', f, str)
                 for f in fields])
@@ -142,13 +141,15 @@ class ScanPolicyAPI(SCEndpoint):
             >>> template = sc.policies.template_details(2)
             >>> pprint(template)
         '''
-        params = dict()
+        params = {}
         if fields:
             params['fields'] = ','.join([self._check('field', f, str)
                 for f in self._check('fields', fields, list)])
 
-        resp = self._api.get('policyTemplate/{}'.format(self._check('id', id, int)),
-            params=params).json()['response']
+        resp = self._api.get(
+            f"policyTemplate/{self._check('id', id, int)}", params=params
+        ).json()['response']
+
 
         if 'editor' in resp:
             # Everything is packed JSON, so lets decode the JSON documents into
@@ -157,7 +158,7 @@ class ScanPolicyAPI(SCEndpoint):
             # Now to decompose the embeddable credentials settings.  What we
             # intend to do here is return the default settings for every
             # credential set that can be returned.
-            resp['credentials'] = dict()
+            resp['credentials'] = {}
             if 'credentials' in editor:
                 emcreds = json.loads(editor['credentials'])
                 for group in emcreds['groups']:
@@ -166,7 +167,7 @@ class ScanPolicyAPI(SCEndpoint):
 
             # Now to perform the same action as we did for the credentials with
             # the policy preferences as well.
-            resp['preferences'] = dict()
+            resp['preferences'] = {}
             for section in editor['sections']:
                 if section['id'] != 'setup':
                     resp['preferences'] = dict_merge(resp['preferences'],
@@ -196,7 +197,7 @@ class ScanPolicyAPI(SCEndpoint):
             >>> for policy in policies['manageable']:
             ...     pprint(policy)
         '''
-        params = dict()
+        params = {}
         if fields:
             params['fields'] = ','.join([self._check('field', f, str)
                 for f in self._check('fields', fields, list)])
@@ -224,13 +225,14 @@ class ScanPolicyAPI(SCEndpoint):
             >>> policy = sc.policies.details(2)
             >>> pprint(policy)
         '''
-        params = dict()
+        params = {}
         if fields:
             params['fields'] = ','.join([self._check('field', f, str)
                 for f in self._check('fields', fields, list)])
 
-        return self._api.get('policy/{}'.format(self._check('id', id, int)),
-            params=params).json()['response']
+        return self._api.get(
+            f"policy/{self._check('id', id, int)}", params=params
+        ).json()['response']
 
     def create(self, **kw):
         '''
@@ -285,8 +287,10 @@ class ScanPolicyAPI(SCEndpoint):
 
         # Next, if there are any preferences that the user provided, we will
         # overlay those on top of the now constructed defaults.
-        kw['preferences'] = dict_merge(template['preferences'],
-            kw.get('preferences', dict()))
+        kw['preferences'] = dict_merge(
+            template['preferences'], kw.get('preferences', {})
+        )
+
 
         policy = self._constructor(**kw)
         return self._api.post('policy', json=policy).json()['response']
@@ -343,12 +347,16 @@ class ScanPolicyAPI(SCEndpoint):
         # If remove_prefs is specified, then we will want to validate and move
         # the values over to the camelCase equiv.
         if 'remove_prefs' in policy:
-            policy['removePrefs'] = [self._check('remove:{}'.format(a), a, str)
-                for a in self._check('remove_prefs', policy['remove_prefs'], list)]
+            policy['removePrefs'] = [
+                self._check(f'remove:{a}', a, str)
+                for a in self._check('remove_prefs', policy['remove_prefs'], list)
+            ]
+
             del(policy['remove_prefs'])
 
-        return self._api.patch('policy/{}'.format(
-            self._check('id', id, int)), json=policy).json()['response']
+        return self._api.patch(
+            f"policy/{self._check('id', id, int)}", json=policy
+        ).json()['response']
 
     def delete(self, id):
         '''
@@ -366,8 +374,9 @@ class ScanPolicyAPI(SCEndpoint):
         Examples:
             >>> sc.policies.delete(10001)
         '''
-        return self._api.delete('policy/{}'.format(
-            self._check('id', id, int))).json()['response']
+        return self._api.delete(f"policy/{self._check('id', id, int)}").json()[
+            'response'
+        ]
 
     def copy(self, id, name=None):
         '''
@@ -387,11 +396,12 @@ class ScanPolicyAPI(SCEndpoint):
             >>> policy = sc.policies.copy(10001)
             >>> pprint(policy)
         '''
-        payload = dict()
+        payload = {}
         if name:
             payload['name'] = self._check('name', name, str)
-        return self._api.post('policy/{}/copy'.format(
-            self._check('id', id, int)), json=payload).json()['response']
+        return self._api.post(
+            f"policy/{self._check('id', id, int)}/copy", json=payload
+        ).json()['response']
 
     def export_policy(self, id, fobj=None):
         '''
@@ -417,8 +427,10 @@ class ScanPolicyAPI(SCEndpoint):
             >>> with open('example_policy.xml', 'wb') as fobj:
             ...     sc.policies.export_policy(1001, fobj)
         '''
-        resp = self._api.post('policy/{}/export'.format(
-            self._check('id', id, int)), stream=True)
+        resp = self._api.post(
+            f"policy/{self._check('id', id, int)}/export", stream=True
+        )
+
 
         # if no file-like object was passed, then we will instantiate a BytesIO
         # object to push the file into.
@@ -480,10 +492,12 @@ class ScanPolicyAPI(SCEndpoint):
 
             >>> sc.policies.share(10001, 1, 2, 3)
         '''
-        return self._api.post('policy/{}/share'.format(
-            self._check('id', id, int)), json={'groups': [{
-                'id': self._check('group_id', i, int)}
-                    for i in groups]}).json()['response']
+        return self._api.post(
+            f"policy/{self._check('id', id, int)}/share",
+            json={
+                'groups': [{'id': self._check('group_id', i, int)} for i in groups]
+            },
+        ).json()['response']
 
     def tags(self):
         '''

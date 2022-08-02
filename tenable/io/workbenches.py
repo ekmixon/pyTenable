@@ -134,8 +134,9 @@ class WorkbenchesAPI(TIOEndpoint):
             >>> for entry in tio.workbenches.asset_activity(asset_id):
             ...     pprint(entry)
         '''
-        return self._api.get('workbenches/assets/{}/activity'.format(
-            self._check('uuid', uuid, 'uuid'))).json()['activity']
+        return self._api.get(
+            f"workbenches/assets/{self._check('uuid', uuid, 'uuid')}/activity"
+        ).json()['activity']
 
     def asset_info(self, uuid, all_fields=True):
         '''
@@ -168,8 +169,10 @@ class WorkbenchesAPI(TIOEndpoint):
             # are returning by default.
             del(query['all_fields'])
 
-        return self._api.get('workbenches/assets/{}/info'.format(
-            self._check('uuid', uuid, 'uuid')), params=query).json()['info']
+        return self._api.get(
+            f"workbenches/assets/{self._check('uuid', uuid, 'uuid')}/info",
+            params=query,
+        ).json()['info']
 
     def asset_vulns(self, uuid, *filters, **kw):
         '''
@@ -208,8 +211,9 @@ class WorkbenchesAPI(TIOEndpoint):
             self._api.filters.workbench_vuln_filters())
 
         return self._api.get(
-            'workbenches/assets/{}/vulnerabilities'.format(
-                self._check('uuid', uuid, 'uuid')), params=query).json()['vulnerabilities']
+            f"workbenches/assets/{self._check('uuid', uuid, 'uuid')}/vulnerabilities",
+            params=query,
+        ).json()['vulnerabilities']
 
     def asset_vuln_info(self, uuid, plugin_id, *filters, **kw):
         '''
@@ -251,9 +255,9 @@ class WorkbenchesAPI(TIOEndpoint):
             self._api.filters.workbench_vuln_filters())
 
         return self._api.get(
-            'workbenches/assets/{}/vulnerabilities/{}/info'.format(
-                self._check('uuid', uuid, 'uuid'),
-                self._check('plugin_id', plugin_id, int)), params=query).json()['info']
+            f"workbenches/assets/{self._check('uuid', uuid, 'uuid')}/vulnerabilities/{self._check('plugin_id', plugin_id, int)}/info",
+            params=query,
+        ).json()['info']
 
     def asset_vuln_output(self, uuid, plugin_id, *filters, **kw):
         '''
@@ -295,9 +299,9 @@ class WorkbenchesAPI(TIOEndpoint):
             self._api.filters.workbench_vuln_filters())
 
         return self._api.get(
-            'workbenches/assets/{}/vulnerabilities/{}/outputs'.format(
-                self._check('uuid', uuid, 'uuid'),
-                self._check('plugin_id', plugin_id, int)), params=query).json()['outputs']
+            f"workbenches/assets/{self._check('uuid', uuid, 'uuid')}/vulnerabilities/{self._check('plugin_id', plugin_id, int)}/outputs",
+            params=query,
+        ).json()['outputs']
 
     def asset_delete(self, asset_uuid):
         '''
@@ -315,8 +319,9 @@ class WorkbenchesAPI(TIOEndpoint):
             >>> asset_id = '00000000-0000-0000-0000-000000000000'
             >>> tio.workbenches.asset_delete(asset_id)
         '''
-        self._api.delete('workbenches/assets/{}'.format(
-            self._check('asset_uuid', asset_uuid, 'uuid')))
+        self._api.delete(
+            f"workbenches/assets/{self._check('asset_uuid', asset_uuid, 'uuid')}"
+        )
 
     def vuln_assets(self, *filters, **kw):
         '''
@@ -454,28 +459,24 @@ class WorkbenchesAPI(TIOEndpoint):
         # Now we need to set the FileObject.  If one was passed to us, then lets
         # just use that, otherwise we will need to instantiate a BytesIO object
         # to push the data into.
-        if 'fobj' in kw:
-            fobj = kw['fobj']
-        else:
-            fobj = BytesIO()
-
+        fobj = kw['fobj'] if 'fobj' in kw else BytesIO()
         # The first thing that we need to do is make the request and get the
         # File id for the job.
         fid = self._api.get('workbenches/export',
             params=params).json()['file']
-        self._api._log.debug('Initiated workbench export {}'.format(fid))
+        self._api._log.debug(f'Initiated workbench export {fid}')
 
         # Next we will wait for the state of the export request to become
         # ready.  We will query the API every half a second until we get the
         # response we're looking for.
         self._wait_for_download(
-            'workbenches/export/{}/status'.format(fid),
-            'workbenches', 'export', fid)
+            f'workbenches/export/{fid}/status', 'workbenches', 'export', fid
+        )
+
 
         # Now that the status has reported back as "ready", we can actually
         # download the file.
-        resp = self._api.get('workbenches/export/{}/download'.format(
-            fid), stream=True)
+        resp = self._api.get(f'workbenches/export/{fid}/download', stream=True)
 
         # Lets stream the file into the file-like object...
         for chunk in resp.iter_content(chunk_size=1024):
@@ -574,8 +575,9 @@ class WorkbenchesAPI(TIOEndpoint):
             self._api.filters.workbench_vuln_filters())
 
         return self._api.get(
-            'workbenches/vulnerabilities/{}/info'.format(
-                self._check('plugin_id', plugin_id, int)), params=query).json()['info']
+            f"workbenches/vulnerabilities/{self._check('plugin_id', plugin_id, int)}/info",
+            params=query,
+        ).json()['info']
 
     def vuln_outputs(self, plugin_id, *filters, **kw):
         '''
@@ -611,5 +613,6 @@ class WorkbenchesAPI(TIOEndpoint):
             self._api.filters.workbench_vuln_filters())
 
         return self._api.get(
-            'workbenches/vulnerabilities/{}/outputs'.format(
-                self._check('plugin_id', plugin_id, int)), params=query).json()['outputs']
+            f"workbenches/vulnerabilities/{self._check('plugin_id', plugin_id, int)}/outputs",
+            params=query,
+        ).json()['outputs']

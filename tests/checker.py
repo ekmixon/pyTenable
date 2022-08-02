@@ -10,10 +10,10 @@ def check(i, name, val_type, allow_none=False):
 
 
 def single(var, val_type):
-    reuuid = r'^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$'
-    reuuids = r'^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12,32}$'
-
     if var != None:
+        reuuid = r'^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$'
+        reuuids = r'^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12,32}$'
+
         if val_type == 'datetime':
             assert isinstance(dateparse(var), datetime.datetime)
         elif val_type == 'uuid':
@@ -21,6 +21,6 @@ def single(var, val_type):
         elif val_type == 'scanner-uuid':
             assert len(re.findall(reuuids, var)) > 0
         elif sys.version_info.major == 2 and val_type == str:
-            assert isinstance(var, unicode) or isinstance(var, str)
+            assert isinstance(var, (unicode, str))
         else:
             assert isinstance(var, val_type)

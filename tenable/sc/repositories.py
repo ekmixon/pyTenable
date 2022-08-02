@@ -110,9 +110,8 @@ class RepositoryAPI(SCEndpoint):
         if 'preferences' in kwargs:
             # Validate that all of the preferences are K:V pairs of strings.
             for key in self._check('preferences', kwargs['preferences'], dict):
-                self._check('preference:{}'.format(key), key, str)
-                self._check('preference:{}:value'.format(key),
-                            kwargs['preferences'][key], str)
+                self._check(f'preference:{key}', key, str)
+                self._check(f'preference:{key}:value', kwargs['preferences'][key], str)
 
         if 'mdm_id' in kwargs:
             kwargs['mdm'] = {'id': self._check('mdm_id', kwargs['mdm_id'], int)}
@@ -178,7 +177,7 @@ class RepositoryAPI(SCEndpoint):
 
             >>> repos = sc.repositories.list(repo_type='Remote')
         '''
-        params = dict()
+        params = {}
         if repo_type:
             params['type'] = self._check('repo_type', repo_type, str, choices=[
                 'All', 'Local', 'Remote', 'Offline'])
@@ -367,12 +366,14 @@ class RepositoryAPI(SCEndpoint):
         Examples:
             >>> repo = sc.repositories.details(1)
         '''
-        params = dict()
+        params = {}
         if fields:
             params['fields'] = ','.join([self._check('field', f, str) for f in fields])
 
-        return self._api.get('repository/{}'.format(
-            self._check('repository_id', repository_id, int)), params=params).json()['response']
+        return self._api.get(
+            f"repository/{self._check('repository_id', repository_id, int)}",
+            params=params,
+        ).json()['response']
 
     def delete(self, repository_id):
         '''
@@ -390,8 +391,9 @@ class RepositoryAPI(SCEndpoint):
         Examples:
             >>> sc.repositories.delete(1)
         '''
-        return self._api.delete('repository/{}'.format(
-            self._check('repository_id', repository_id, int))).json()['response']
+        return self._api.delete(
+            f"repository/{self._check('repository_id', repository_id, int)}"
+        ).json()['response']
 
     def edit(self, repository_id, **kwargs):
         '''
@@ -458,8 +460,10 @@ class RepositoryAPI(SCEndpoint):
             >>> repo = sc.repositories.edit(1, name='Example IPv4')
         '''
         kwargs = self._constructor(**kwargs)
-        return self._api.patch('repository/{}'.format(
-            self._check('repository_id', repository_id, int)), json=kwargs).json()['response']
+        return self._api.patch(
+            f"repository/{self._check('repository_id', repository_id, int)}",
+            json=kwargs,
+        ).json()['response']
 
     def accept_risk_rules(self, repository_id, **kwargs):
         '''
@@ -483,8 +487,10 @@ class RepositoryAPI(SCEndpoint):
             >>> rules = sc.repositories.accept_risk_rules(1)
         '''
         params = self._rules_constructor(**kwargs)
-        return self._api.get('repository/{}/acceptRiskRule'.format(
-            self._check('repository_id', repository_id, int)), params=params).json()['response']
+        return self._api.get(
+            f"repository/{self._check('repository_id', repository_id, int)}/acceptRiskRule",
+            params=params,
+        ).json()['response']
 
     def recast_risk_rules(self, repository_id, **kwargs):
         '''
@@ -509,8 +515,10 @@ class RepositoryAPI(SCEndpoint):
             >>> rules = sc.repositories.recast_risk_rules(1)
         '''
         params = self._rules_constructor(**kwargs)
-        return self._api.get('repository/{}/recastRiskRule'.format(
-            self._check('repository_id', repository_id, int)), params=params).json()['response']
+        return self._api.get(
+            f"repository/{self._check('repository_id', repository_id, int)}/recastRiskRule",
+            params=params,
+        ).json()['response']
 
     def asset_intersections(self, repository_id, uuid=None, ip_address=None, dns=None):
         '''
@@ -533,16 +541,21 @@ class RepositoryAPI(SCEndpoint):
             >>> assetlists = sc.repositories.asset_intersection(1,
             ...     ip='192.168.0.1')
         '''
-        params = dict()
+        params = {}
         if dns:
             params['dnsName'] = self._check('dns', dns, str)
         if ip_address:
             params['ip'] = self._check('ip_address', ip_address, str)
         if uuid:
             params['uuid'] = self._check('uuid', uuid, 'uuid')
-        return self._api.get('repository/{}/assetIntersections'.format(
-            self._check('repository_id', repository_id, int)),
-            params=params).json()['response'].get('assets')
+        return (
+            self._api.get(
+                f"repository/{self._check('repository_id', repository_id, int)}/assetIntersections",
+                params=params,
+            )
+            .json()['response']
+            .get('assets')
+        )
 
     def import_repository(self, repository_id, fobj):
         '''
@@ -563,10 +576,10 @@ class RepositoryAPI(SCEndpoint):
             >>> with open('repo.tar.gz', 'rb') as archive:
             ...     sc.repositories.import_repository(1, archive)
         '''
-        return self._api.post('repository/{}/import'.format(
-            self._check('repository_id', repository_id, int)), json={
-            'file': self._api.files.upload(fobj)
-        }).json()['response']
+        return self._api.post(
+            f"repository/{self._check('repository_id', repository_id, int)}/import",
+            json={'file': self._api.files.upload(fobj)},
+        ).json()['response']
 
     def export_repository(self, repository_id, fobj):
         '''
@@ -588,8 +601,11 @@ class RepositoryAPI(SCEndpoint):
             >>> with open('repo.tar.gz', 'wb') as archive:
             ...     sc.repositories.export_repository(1, archive)
         '''
-        resp = self._api.get('repository/{}/export'.format(
-            self._check('repository_id', repository_id, int)), stream=True)
+        resp = self._api.get(
+            f"repository/{self._check('repository_id', repository_id, int)}/export",
+            stream=True,
+        )
+
 
         # Lets stream the file into the file-like object...
         for chunk in resp.iter_content(chunk_size=1024):
@@ -616,8 +632,10 @@ class RepositoryAPI(SCEndpoint):
         Examples:
             >>> sc.repositories.remote_sync(1)
         '''
-        return self._api.post('repository/{}/sync'.format(
-            self._check('repository_id', repository_id, int)), json={}).json()['response']
+        return self._api.post(
+            f"repository/{self._check('repository_id', repository_id, int)}/sync",
+            json={},
+        ).json()['response']
 
     def mobile_sync(self, repository_id):
         '''
@@ -637,8 +655,10 @@ class RepositoryAPI(SCEndpoint):
         Examples:
             >>> sc.repositories.mobile_sync(1)
         '''
-        return self._api.post('repository/{}/updateMobileData'.format(
-            self._check('repository_id', repository_id, int)), json={}).json()['response']
+        return self._api.post(
+            f"repository/{self._check('repository_id', repository_id, int)}/updateMobileData",
+            json={},
+        ).json()['response']
 
     def device_info(self, repository_id, dns=None, ip_address=None, uuid=None, fields=None):
         '''
@@ -674,7 +694,7 @@ class RepositoryAPI(SCEndpoint):
         if VersionInfo.parse(self._api.version).match('<5.7.0'):
             method = 'ipInfo'
 
-        params = dict()
+        params = {}
         if fields:
             params['fields'] = ','.join(
                 [self._check('field', f, str) for f in fields]

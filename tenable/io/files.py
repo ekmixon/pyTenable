@@ -42,7 +42,7 @@ class FileAPI(TIOEndpoint):
         # We will attempt to discover the name of the file stored within the
         # file object.  If none exists however, we will generate a random
         # uuid string to use instead.
-        kw = dict()
+        kw = {}
         if encrypted:
             kw['data'] = {'no_enc': int(encrypted)}
         kw['files'] = {'Filedata': fobj}

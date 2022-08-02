@@ -57,8 +57,7 @@ class AssetsAPI(TIOEndpoint):
             >>> asset_id = '00000000-0000-0000-0000-000000000000'
             >>> tio.asset.delete(asset_id)
         '''
-        self._api.delete('workbenches/assets/{}'.format(
-            self._check('uuid', uuid, 'uuid')))
+        self._api.delete(f"workbenches/assets/{self._check('uuid', uuid, 'uuid')}")
 
     def details(self, uuid):
         '''
@@ -78,10 +77,7 @@ class AssetsAPI(TIOEndpoint):
             >>> asset = tio.assets.details(
             ...     '00000000-0000-0000-0000-000000000000')
         '''
-        return self._api.get(
-            'assets/{}'.format(
-                self._check('uuid', uuid, str)
-            )).json()
+        return self._api.get(f"assets/{self._check('uuid', uuid, str)}").json()
 
     def assign_tags(self, action, assets, tags):
         '''
@@ -132,9 +128,8 @@ class AssetsAPI(TIOEndpoint):
             ...     '00000000-0000-0000-0000-000000000000')
         '''
         return self._api.get(
-            'tags/assets/{}/assignments'.format(
-                self._check('uuid', uuid, 'uuid')
-            )).json()
+            f"tags/assets/{self._check('uuid', uuid, 'uuid')}/assignments"
+        ).json()
 
     def asset_import(self, source, *assets):
         '''
@@ -226,9 +221,8 @@ class AssetsAPI(TIOEndpoint):
             >>> pprint(job)
         '''
         return self._api.get(
-            'import/asset-jobs/{}'.format(
-                self._check('uuid', uuid, str)
-            )).json()
+            f"import/asset-jobs/{self._check('uuid', uuid, str)}"
+        ).json()
 
     def move_assets(self, source, destination, targets):
         '''
@@ -286,14 +280,11 @@ class AssetsAPI(TIOEndpoint):
             ...     ('host.hostname', 'match', 'asset.com'), filter_type='or')
             >>> pprint(asset)
         '''
-        payload = dict()
-
         # run the rules through the filter parser...
         filter_type = self._check('filter_type', filter_type, str,
             choices=['and', 'or'], default='and', case='lower')
         parsed = self._parse_filters(
             filters, self._api.filters.workbench_asset_filters(), rtype='assets')['asset']
 
-        payload['query'] = {filter_type: parsed}
-
+        payload = {'query': {filter_type: parsed}}
         return self._api.post('api/v2/assets/bulk-jobs/delete', json=payload).json()

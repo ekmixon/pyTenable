@@ -73,7 +73,7 @@ class TargetGroupsAPI(TIOEndpoint):
         Examples:
             >>> tio.target_groups.delete(1)
         '''
-        self._api.delete('target-groups/{}'.format(self._check('id', id, int)))
+        self._api.delete(f"target-groups/{self._check('id', id, int)}")
 
     def details(self, id):
         '''
@@ -91,8 +91,7 @@ class TargetGroupsAPI(TIOEndpoint):
         Examples:
             >>> tg = tio.target_groups.details(1)
         '''
-        return self._api.get('target-groups/{}'.format(
-            self._check('id', id, int))).json()
+        return self._api.get(f"target-groups/{self._check('id', id, int)}").json()
 
     def edit(self, id, **kw):
         '''
@@ -122,7 +121,7 @@ class TargetGroupsAPI(TIOEndpoint):
         Examples:
             >>> tio.target_groups.edit(1, name='Updated TG Name')
         '''
-        payload = dict()
+        payload = {}
 
         if 'name' in kw:
             payload['name'] = self._check('name', kw['name'], str)
@@ -141,7 +140,7 @@ class TargetGroupsAPI(TIOEndpoint):
             'members': craw.get('members'),
         }
         payload = dict_merge(current, payload)
-        return self._api.put('target-groups/{}'.format(id), json=payload).json()
+        return self._api.put(f'target-groups/{id}', json=payload).json()
 
     def list(self):
         '''

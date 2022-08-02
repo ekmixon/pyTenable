@@ -91,7 +91,7 @@ class TagsAPI(TIOEndpoint):
         '''
         Simple current_domain_permission tuple expander. Also supports validation of values
         '''
-        resp = list()
+        resp = []
         for item in items:
             self._check('item', item, (tuple, dict))
             if isinstance(item, tuple):
@@ -108,17 +108,26 @@ class TagsAPI(TIOEndpoint):
                         for i in self._check('permissions', item[3], list)],
                 })
             else:
-                data = dict()
-                data['id'] = self._check('id', item['id'], 'uuid')
+                data = {'id': self._check('id', item['id'], 'uuid')}
                 data['name'] = self._check('name', item['name'], str)
                 data['type'] = self._check('type', item['type'], str,
                     choices=['user', 'group'], case='upper')
                 data['permissions'] = [
-                    self._check('i', i, str,
-                        choices=['ALL', 'CAN_EDIT', 'CAN_SET_PERMISSIONS'], case='upper')
-                    for i in self._check('permissions', item['permissions']
-                        if 'permissions' in item else None, list,
-                            default=list())]
+                    self._check(
+                        'i',
+                        i,
+                        str,
+                        choices=['ALL', 'CAN_EDIT', 'CAN_SET_PERMISSIONS'],
+                        case='upper',
+                    )
+                    for i in self._check(
+                        'permissions',
+                        item['permissions'] if 'permissions' in item else None,
+                        list,
+                        default=[],
+                    )
+                ]
+
                 resp.append(data)
 
         return resp
@@ -132,11 +141,7 @@ class TagsAPI(TIOEndpoint):
             choices=['and', 'or'], default='and', case='lower')
 
         # created default dictionary for payload filters key
-        payload_filters = dict({
-            'asset': dict({
-                filter_type: list()
-            })
-        })
+        payload_filters = dict({'asset': dict({filter_type: []})})
 
         if len(filters) > 0:
             # run the filters through the filter parser and update payload_filters
@@ -226,7 +231,7 @@ class TagsAPI(TIOEndpoint):
             >>> tio.tags.create('00000000-0000-0000-0000-000000000000', 'Madison')
         '''
         all_permissions = ['ALL', 'CAN_EDIT', 'CAN_SET_PERMISSIONS']
-        payload = dict()
+        payload = {}
 
         # First lets see if the category is a UUID or a general string.  If its
         # a UUID, then we will pass the value of category into the category_uuid
@@ -248,22 +253,29 @@ class TagsAPI(TIOEndpoint):
             payload['category_description'] = self._check(
                 'category_description', category_description, str)
         if not current_domain_permissions:
-            current_domain_permissions = list()
+            current_domain_permissions = []
 
         payload['access_control'] = {
-            # setting default current_user_permissions to all
             'current_user_permissions': all_permissions,
-
-            # check and assign all_users_permissions
             'all_users_permissions': [
-                self._check('i', i, str, choices=['ALL', 'CAN_EDIT', 'CAN_SET_PERMISSIONS'])
-                for i in self._check('all_users_permissions', all_users_permissions, list,
-                    default=list(), case='upper')],
-
-            # run the current_domain_permissions through the permission_constructor
+                self._check(
+                    'i', i, str, choices=['ALL', 'CAN_EDIT', 'CAN_SET_PERMISSIONS']
+                )
+                for i in self._check(
+                    'all_users_permissions',
+                    all_users_permissions,
+                    list,
+                    default=[],
+                    case='upper',
+                )
+            ],
             'current_domain_permissions': self._permission_constructor(
-                self._check('current_domain_permissions', current_domain_permissions, list)),
+                self._check(
+                    'current_domain_permissions', current_domain_permissions, list
+                )
+            ),
         }
+
 
         # if filters are defined, run the filters through the filter parser...
         if self._check('filters', filters, list):
@@ -289,8 +301,7 @@ class TagsAPI(TIOEndpoint):
         Examples:
             >>> tio.tags.create_category('Location')
         '''
-        payload = dict()
-        payload['name'] = self._check('name', name, str)
+        payload = {'name': self._check('name', name, str)}
         if description:
             payload['description'] = self._check('description', description, str)
         return self._api.post('tags/categories', json=payload).json()
@@ -319,8 +330,10 @@ class TagsAPI(TIOEndpoint):
             ...     '10000000-0000-0000-0000-000000000001')
         '''
         if len(tag_value_uuids) <= 1:
-            self._api.delete('tags/values/{}'.format(
-                self._check('tag_value_uuid', tag_value_uuids[0], 'uuid')))
+            self._api.delete(
+                f"tags/values/{self._check('tag_value_uuid', tag_value_uuids[0], 'uuid')}"
+            )
+
         else:
             self._api.post('tags/values/delete-requests',
                 json={'values': [
@@ -343,8 +356,9 @@ class TagsAPI(TIOEndpoint):
         Examples:
             >>> tio.tags.delete('00000000-0000-0000-0000-000000000000')
         '''
-        self._api.delete('tags/categories/{}'.format(
-            self._check('tag_category_uuid', tag_category_uuid, 'uuid')))
+        self._api.delete(
+            f"tags/categories/{self._check('tag_category_uuid', tag_category_uuid, 'uuid')}"
+        )
 
     def details(self, tag_value_uuid):
         '''
@@ -437,8 +451,7 @@ class TagsAPI(TIOEndpoint):
             >>> tio.tags.edit('00000000-0000-0000-0000-000000000000',
             ...     name='NewValueName')
         '''
-        payload = dict()
-        payload['value'] = self._check('value', value, str)
+        payload = {'value': self._check('value', value, str)}
         if description:
             payload['description'] = self._check('description', description, str)
 
@@ -451,7 +464,7 @@ class TagsAPI(TIOEndpoint):
         access_control = current_access_control.copy()
 
         # initialize access controls
-        payload['access_control'] = dict()
+        payload['access_control'] = {}
 
         # Set all users permission
         if all_users_permissions is not None:
@@ -476,7 +489,7 @@ class TagsAPI(TIOEndpoint):
             current_version = 0
 
         # version value must be incremented each time the permissions are updated
-        if not payload['access_control'] == access_control:
+        if payload['access_control'] != access_control:
             payload['access_control']['version'] = current_version + 1
 
         # if filters are defined, run the filters through the filter parser...
@@ -516,8 +529,7 @@ class TagsAPI(TIOEndpoint):
             >>> tio.tags.edit_category('00000000-0000-0000-0000-000000000000',
             ...     name='NewValueName')
         '''
-        payload = dict()
-        payload['name'] = self._check('name', name, str)
+        payload = {'name': self._check('name', name, str)}
         if description:
             payload['description'] = self._check('description', description, str)
         return self._api.put('tags/categories/{}'.format(self._check(
@@ -533,10 +545,23 @@ class TagsAPI(TIOEndpoint):
             query['ft'] = self._check('filter_type', filter_type, str,
                 choices=['AND', 'OR'], case='upper')
         if sort and self._check('sort', sort, tuple):
-            query['sort'] = ','.join(['{}:{}'.format(
-                self._check('sort_field', i[0], str, choices=[k for k in filterdefs.keys()]),
-                self._check('sort_direction', i[1], str, choices=['asc', 'desc'])
-            ) for i in sort])
+            query['sort'] = ','.join(
+                [
+                    '{}:{}'.format(
+                        self._check(
+                            'sort_field',
+                            i[0],
+                            str,
+                            choices=list(filterdefs.keys()),
+                        ),
+                        self._check(
+                            'sort_direction', i[1], str, choices=['asc', 'desc']
+                        ),
+                    )
+                    for i in sort
+                ]
+            )
+
         return query
 
     def list(self, *filters, **kw):
@@ -583,9 +608,13 @@ class TagsAPI(TIOEndpoint):
             >>> for tag in tio.tags.list(('category_name', 'eq', 'Location')):
             ...     pprint(tag)
         '''
-        query = self._tag_list_constructor(filters, self._filterset_tags,
-            kw['filter_type'] if 'filter_type' in kw else None,
-            kw['sort'] if 'sort' in kw else None)
+        query = self._tag_list_constructor(
+            filters,
+            self._filterset_tags,
+            kw.get('filter_type', None),
+            kw.get('sort', None),
+        )
+
         return TagsIterator(self._api,
             _limit=self._check('limit', kw.get('limit', 1000), int),
             _offset=self._check('offset', kw.get('offset', 0), int),
@@ -640,9 +669,13 @@ class TagsAPI(TIOEndpoint):
             ...   ('name', 'eq', 'Location')):
             ...     pprint(tag)
         '''
-        query = self._tag_list_constructor(filters, self._filterset_categories,
-            kw['filter_type'] if 'filter_type' in kw else None,
-            kw['sort'] if 'sort' in kw else None)
+        query = self._tag_list_constructor(
+            filters,
+            self._filterset_categories,
+            kw.get('filter_type', None),
+            kw.get('sort', None),
+        )
+
         return TagsIterator(self._api,
             _limit=self._check('limit', kw.get('limit', 1000), int),
             _offset=self._check('offset', kw.get('offset', 0), int),

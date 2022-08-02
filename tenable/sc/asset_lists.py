@@ -94,10 +94,9 @@ class AssetListAPI(SCEndpoint):
                         resp['pluginIDConstraint'] = ','.join(
                             [str(r) for r in rule[3]])
                     else:
-                        raise TypeError(
-                            'rule {} has an invalid plugin constraint.'.format(rule))
+                        raise TypeError(f'rule {rule} has an invalid plugin constraint.')
         else:
-            raise TypeError('rules {} not a tuple or dict'.format(rule))
+            raise TypeError(f'rules {rule} not a tuple or dict')
         return resp
 
     def _constructor(self, **kw):
@@ -200,9 +199,7 @@ class AssetListAPI(SCEndpoint):
             del(kw['dn'])
             del(kw['search_string'])
             del(kw['ldap_id'])
-        elif (('dn' in kw and ('search_string' not in kw or 'ldap_id' not in kw))
-          or ('search_string' in kw and ('dn' not in kw or 'ldap_id' not in kw))
-          or ('ldap_id' in kw and ('search_string' not in kw or 'dn' not in kw))):
+        elif 'dn' in kw or 'search_string' in kw or 'ldap_id' in kw:
             raise UnexpectedValueError(
                 'dn, search_string, and ldap_id must all be present')
 
@@ -227,7 +224,7 @@ class AssetListAPI(SCEndpoint):
             # validate the filters attribute is a list.  For each item, we will
             # want to convert any tuples to the expanded dictionaries and simply
             # pass through any dictionaries.
-            flist = list()
+            flist = []
             for f in self._check('filters', kw['filters'], list):
                 if isinstance(f, tuple):
                     flist.append({
@@ -458,12 +455,14 @@ class AssetListAPI(SCEndpoint):
             >>> asset_id_details = sc.asset_lists.details(1,1)
             >>> pprint(asset_id_details)
         '''
-        params = dict()
+        params = {}
         if fields:
             params['fields'] = ','.join([self._check('field', f, str) for f in fields])
         if org_id:
             params['orgID'] = org_id
-        return self._api.get('asset/{}'.format(self._check('id', id,int)),params=params).json()['response']
+        return self._api.get(
+            f"asset/{self._check('id', id, int)}", params=params
+        ).json()['response']
 
     def edit(self, id, **kw):
         '''
@@ -564,8 +563,9 @@ class AssetListAPI(SCEndpoint):
             >>> asset-list = sc.asset_lists.edit()
         '''
         payload = self._constructor(**kw)
-        return self._api.patch('asset/{}'.format(
-            self._check('id', id, int)), json=payload).json()['response']
+        return self._api.patch(
+            f"asset/{self._check('id', id, int)}", json=payload
+        ).json()['response']
 
     def delete(self, id):
         '''
@@ -582,8 +582,9 @@ class AssetListAPI(SCEndpoint):
         Examples:
             >>> sc.asset_lists.delete(1)
         '''
-        return self._api.delete('asset/{}'.format(
-            self._check('id', id, int))).json()['response']
+        return self._api.delete(f"asset/{self._check('id', id, int)}").json()[
+            'response'
+        ]
 
     def list(self, fields=None):
         '''
@@ -602,7 +603,7 @@ class AssetListAPI(SCEndpoint):
             >>> for asset-list in sc.asset_lists.list():
             ...     pprint(asset-list)
         '''
-        params = dict()
+        params = {}
         if fields:
             params['fields'] = ','.join([self._check('field', f, str)
                 for f in fields])
@@ -653,8 +654,7 @@ class AssetListAPI(SCEndpoint):
             >>> with open('example.xml', 'wb') as fobj:
             ...     sc.asset_lists.export_definition(1, fobj)
         '''
-        resp = self._api.get('asset/{}/export'.format(
-            self._check('id', id, int)), stream=True)
+        resp = self._api.get(f"asset/{self._check('id', id, int)}/export", stream=True)
 
         # if no file-like object was passed, then we will instantiate a BytesIO
         # object to push the file into.
@@ -694,11 +694,13 @@ class AssetListAPI(SCEndpoint):
 
             >>> sc.asset_lists.refresh(1, 1, 1, 2, 3)
         '''
-        return self._api.post('asset/{}/refresh'.format(
-            self._check('id', id, int)), json={
+        return self._api.post(
+            f"asset/{self._check('id', id, int)}/refresh",
+            json={
                 'orgID': self._check('org_id', org_id, int),
-                'repIDs': [{'id': self._check('repo:id', i, int)} for i in repos]
-            }).json()['response']
+                'repIDs': [{'id': self._check('repo:id', i, int)} for i in repos],
+            },
+        ).json()['response']
 
     def ldap_query(self, ldap_id, dn, search_string):
         '''
@@ -759,7 +761,9 @@ class AssetListAPI(SCEndpoint):
         Examples:
             >>> sc.asset_lists.share(1, group_1, group_2)
         '''
-        return self._api.post('asset/{}/share'.format(
-            self._check('id', id, int)), json={
-                'groups': [{'id': self._check('group:id', i, int)}
-                    for i in groups]}).json()['response']
+        return self._api.post(
+            f"asset/{self._check('id', id, int)}/share",
+            json={
+                'groups': [{'id': self._check('group:id', i, int)} for i in groups]
+            },
+        ).json()['response']

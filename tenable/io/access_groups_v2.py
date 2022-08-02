@@ -64,15 +64,17 @@ class AccessGroupsV2API(TIOEndpoint):
         Simple principle tuple expander.  Also supports validating principle
         dictionaries for transparent passthrough.
         '''
-        resp = list()
+        resp = []
         for item in items:
             self._check('principal', item, (tuple, dict))
             if isinstance(item, tuple):
-                data = dict()
                 if len(item) == 2:
                     item = item + ([],)
-                data['type'] = self._check('principal:type', item[0], str,
-                    choices=['user', 'group'])
+                data = {
+                    'type': self._check(
+                        'principal:type', item[0], str, choices=['user', 'group']
+                    )
+                }
 
                 try:
                     data['principal_id'] = self._check('principal:id', item[1], 'uuid')
@@ -288,7 +290,7 @@ class AccessGroupsV2API(TIOEndpoint):
             ... ])
         '''
         if not principals:
-            principals = list()
+            principals = []
 
         # construct the payload dictionary
         payload = {
@@ -319,8 +321,9 @@ class AccessGroupsV2API(TIOEndpoint):
         Args:
             group_id (str): The UUID of the access group to remove.
         '''
-        self._api.delete('v2/access-groups/{}'.format(
-            self._check('group_id', group_id, 'uuid')))
+        self._api.delete(
+            f"v2/access-groups/{self._check('group_id', group_id, 'uuid')}"
+        )
 
     def edit(self, group_id, **kw):
         '''
@@ -396,7 +399,7 @@ class AccessGroupsV2API(TIOEndpoint):
         }
 
         # call the API endpoint and return the response to the caller.
-        return self._api.put('v2/access-groups/{}'.format(group_id), json=payload).json()
+        return self._api.put(f'v2/access-groups/{group_id}', json=payload).json()
 
     def details(self, group_id):
         '''
@@ -407,5 +410,6 @@ class AccessGroupsV2API(TIOEndpoint):
         Args:
             group_id (str): The UUID of the access group.
         '''
-        return self._api.get('v2/access-groups/{}'.format(
-            self._check('group_id', group_id, 'uuid'))).json()
+        return self._api.get(
+            f"v2/access-groups/{self._check('group_id', group_id, 'uuid')}"
+        ).json()

@@ -226,9 +226,9 @@ def test_scan_instances_export_scan_success(security_center, scan_instance):
     '''
     test scan instances export scan for success
     '''
-    with open('{}.zip'.format(scan_instance['id']), 'wb') as scanfile:
+    with open(f"{scan_instance['id']}.zip", 'wb') as scanfile:
         security_center.scan_instances.export_scan(124, fobj=scanfile)
-    os.remove('{}.zip'.format(scan_instance['id']))
+    os.remove(f"{scan_instance['id']}.zip")
 
 
 @pytest.mark.vcr()
@@ -236,9 +236,9 @@ def test_scan_instances_export_scan_success_no_file(security_center, scan_instan
     '''
     test scan instances export scan success with no file
     '''
-    with open('{}.zip'.format(scan_instance['id']), 'wb'):
+    with open(f"{scan_instance['id']}.zip", 'wb'):
         security_center.scan_instances.export_scan(124)
-    os.remove('{}.zip'.format(scan_instance['id']))
+    os.remove(f"{scan_instance['id']}.zip")
 
 
 @pytest.mark.vcr()

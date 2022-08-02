@@ -77,7 +77,7 @@ def export_assets_to_csv(fobj, assets, *fields):
             if isinstance(v, list):
                 flat[k] = '|'.join([str(i) for i in v])
             if k == 'tags':
-                flat[k] = '|'.join(['{}:{}'.format(i['key'], i['value']) for i in v])
+                flat[k] = '|'.join([f"{i['key']}:{i['value']}" for i in v])
 
         # Write the vulnerability to the CSV File.
         writer.writerow(flat)
@@ -129,18 +129,14 @@ def cli(output, akey, skey, fields, verbose, **kwargs):
 
     kwargs['sources'] = list(kwargs['sources'])
     kwargs['tags'] = list(kwargs['tags'])
-    filters = dict()
-    for key in kwargs.keys():
-        if kwargs[key]:
-            filters[key] = kwargs[key]
-
+    filters = {key: kwargs[key] for key, value in kwargs.items() if value}
     # Instantiate the Tenable.io instance & initiate the vulnerability export.
     tio = TenableIO(akey, skey)
     assets = tio.exports.assets(**filters)
 
     # Pass everything to the CSV generator.
     total = export_assets_to_csv(output, assets, *fields)
-    click.echo('Processed {} Assets'.format(total))
+    click.echo(f'Processed {total} Assets')
 
 
 if __name__ == '__main__':

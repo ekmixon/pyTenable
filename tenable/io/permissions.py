@@ -44,10 +44,10 @@ class PermissionsAPI(TIOEndpoint):
             self._check('acl', item, dict)
 
         # Make the API call.
-        self._api.put('permissions/{}/{}'.format(
-            self._check('otype', otype, str),
-            self._check('id', id, int)
-        ), json={'acls': acls})
+        self._api.put(
+            f"permissions/{self._check('otype', otype, str)}/{self._check('id', id, int)}",
+            json={'acls': acls},
+        )
 
     def list(self, otype, id):
         '''
@@ -66,7 +66,5 @@ class PermissionsAPI(TIOEndpoint):
                 The permission recourse record listings for the specified object.
         '''
         return self._api.get(
-            'permissions/{}/{}'.format(
-                self._check('otype', otype, str),
-                self._check('id', id, int)
-            )).json()['acls']
+            f"permissions/{self._check('otype', otype, str)}/{self._check('id', id, int)}"
+        ).json()['acls']

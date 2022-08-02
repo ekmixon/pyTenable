@@ -357,7 +357,7 @@ def test_exports_compliance(api):
             check(resp, 'status', str)
 
             # keys available in failed and warning and may be available in other status types
-            if resp['status'] == 'FAILED' or resp['status'] == 'WARNING':
+            if resp['status'] in ['FAILED', 'WARNING']:
                 check(resp, 'check_info', str)
                 check(resp, 'see_also', str)
                 check(resp, 'solution', str)
@@ -368,7 +368,7 @@ def test_exports_compliance(api):
                     check(data, 'framework', str)
 
             # keys available in passed, failed and warning type status
-            if resp['status'] == 'FAILED' or resp['status'] == 'WARNING':
+            if resp['status'] in ['FAILED', 'WARNING']:
                 check(resp, 'expected_value', str)
 
             # keys available in error type status

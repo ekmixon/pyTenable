@@ -216,7 +216,7 @@ class OrganizationAPI(SCEndpoint):
             Retrieve all of all of the organizations:
             >>> repos = sc.organizations.list()
         '''
-        params = dict()
+        params = {}
         if fields:
             params['fields'] = ','.join([self._check('field', f, str)
                                          for f in fields])
@@ -238,12 +238,14 @@ class OrganizationAPI(SCEndpoint):
         Examples:
             >>> org = sc.organization.details(1)
         '''
-        params = dict()
+        params = {}
         if fields:
             params['fields'] = ','.join([self._check('field', f, str) for f in fields])
 
-        return self._api.get('organization/{}'.format(
-            self._check('organization_id', organization_id, int)), params=params).json()['response']
+        return self._api.get(
+            f"organization/{self._check('organization_id', organization_id, int)}",
+            params=params,
+        ).json()['response']
 
     def edit(self, organization_id, **kwargs):
         '''Updates an existing organization
@@ -299,8 +301,10 @@ class OrganizationAPI(SCEndpoint):
             >>> sc.organization.edit(1, name='New Name')
         '''
         kwargs = self._constructor(**kwargs)
-        return self._api.patch('organization/{}'.format(
-            self._check('organization_id', organization_id, int)), json=kwargs).json()['response']
+        return self._api.patch(
+            f"organization/{self._check('organization_id', organization_id, int)}",
+            json=kwargs,
+        ).json()['response']
 
     def delete(self, organization_id):
         '''
@@ -314,8 +318,9 @@ class OrganizationAPI(SCEndpoint):
         Examples:
             >>> sc.organization.delete(1)
         '''
-        return self._api.delete('organization/{}'.format(
-            self._check('organization_id', organization_id, int))).json()['response']
+        return self._api.delete(
+            f"organization/{self._check('organization_id', organization_id, int)}"
+        ).json()['response']
 
     def accept_risk_rules(self, organization_id, repos=None, plugin=None, port=None):
         '''
@@ -338,7 +343,7 @@ class OrganizationAPI(SCEndpoint):
             >>> for rule in sc.organizations.accept_risk_rules(1):
             ...     pprint(rule)
         '''
-        params = dict()
+        params = {}
         if repos:
             params['repositoryIDs'] = ','.join([self._check('repo:id', i, int)
                                                 for i in self._check('repos', repos, list)])
@@ -346,8 +351,10 @@ class OrganizationAPI(SCEndpoint):
             params['pluginID'] = self._check('plugin', plugin, int)
         if port:
             params['port'] = self._check('port', port, int)
-        return self._api.get('organization/{}/acceptRiskRule'.format(
-            self._check('organization_id', organization_id, int)), params=params).json()['response']
+        return self._api.get(
+            f"organization/{self._check('organization_id', organization_id, int)}/acceptRiskRule",
+            params=params,
+        ).json()['response']
 
     def recast_risk_rules(self, organization_id, repos=None, plugin=None, port=None):
         '''
@@ -370,7 +377,7 @@ class OrganizationAPI(SCEndpoint):
             >>> for rule in sc.organizations.recast_risk_rules(1):
             ...     pprint(rule)
         '''
-        params = dict()
+        params = {}
         if repos:
             params['repositoryIDs'] = ','.join([self._check('repo:id', i, int)
                                                 for i in self._check('repos', repos, list)])
@@ -378,8 +385,10 @@ class OrganizationAPI(SCEndpoint):
             params['pluginID'] = self._check('plugin', plugin, int)
         if port:
             params['port'] = self._check('port', port, int)
-        return self._api.get('organization/{}/recastRiskRule'.format(
-            self._check('organization_id', organization_id, int)), params=params).json()['response']
+        return self._api.get(
+            f"organization/{self._check('organization_id', organization_id, int)}/recastRiskRule",
+            params=params,
+        ).json()['response']
 
     def managers_list(self, org_id, fields=None):
         '''
@@ -399,12 +408,14 @@ class OrganizationAPI(SCEndpoint):
             Retrieve all of the security managers for a given org.:
             >>> repos = sc.organizations.managers_list()
         '''
-        params = dict()
+        params = {}
         if fields:
             params['fields'] = ','.join([self._check('field', f, str)
                                          for f in fields])
-        return self._api.get('organization/{}/securityManager'.format(
-            self._check('org_id', org_id, int)), params=params).json()['response']
+        return self._api.get(
+            f"organization/{self._check('org_id', org_id, int)}/securityManager",
+            params=params,
+        ).json()['response']
 
     def manager_create(self, org_id, username, password, role, **kwargs):
         '''
@@ -436,8 +447,10 @@ class OrganizationAPI(SCEndpoint):
         kwargs['auth_type'] = kwargs.get('auth_type', 'tns')
         kwargs['responsibleAssetID'] = -1
         payload = self._api.users._constructor(**kwargs)
-        return self._api.post('organization/{}/securityManager'.format(
-            self._check('org_id', org_id, int)), json=payload).json()['response']
+        return self._api.post(
+            f"organization/{self._check('org_id', org_id, int)}/securityManager",
+            json=payload,
+        ).json()['response']
 
     def manager_details(self, org_id, user_id, fields=None):
         '''
@@ -459,14 +472,14 @@ class OrganizationAPI(SCEndpoint):
         Examples:
             >>> secmngr = sc.organizations.manager_details(1, 1)
         '''
-        params = dict()
+        params = {}
         if fields:
             params['fields'] = ','.join([self._check('field', f, str)
                                          for f in fields])
-        return self._api.get('organization/{}/securityManager/{}'.format(
-            self._check('org_id', org_id, int),
-            self._check('user_id', user_id, int)),
-            params=params).json()['response']
+        return self._api.get(
+            f"organization/{self._check('org_id', org_id, int)}/securityManager/{self._check('user_id', user_id, int)}",
+            params=params,
+        ).json()['response']
 
     def manager_edit(self, org_id, user_id, **kwargs):
         '''
@@ -489,10 +502,10 @@ class OrganizationAPI(SCEndpoint):
             ...     username='updated')
         '''
         payload = self._api.users._constructor(**kwargs)
-        return self._api.patch('organization/{}/securityManager/{}'.format(
-            self._check('org_id', org_id, int),
-            self._check('user_id', user_id, int)
-        ), json=payload).json()['response']
+        return self._api.patch(
+            f"organization/{self._check('org_id', org_id, int)}/securityManager/{self._check('user_id', user_id, int)}",
+            json=payload,
+        ).json()['response']
 
     def manager_delete(self, org_id, user_id, migrate_to=None):
         '''
@@ -506,11 +519,11 @@ class OrganizationAPI(SCEndpoint):
         Examples:
             >>> sc.organizations.manager_delete(1, 1)
         '''
-        payload = dict()
+        payload = {}
         if migrate_to:
             payload['migrateUserID'] = self._check('migrate_to', migrate_to, int)
 
-        self._api.delete('organization/{}/securityManager/{}'.format(
-            self._check('org_id', org_id, int),
-            self._check('user_id', user_id, int)
-        ), json=payload)
+        self._api.delete(
+            f"organization/{self._check('org_id', org_id, int)}/securityManager/{self._check('user_id', user_id, int)}",
+            json=payload,
+        )

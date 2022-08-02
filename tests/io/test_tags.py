@@ -751,8 +751,11 @@ def test_tags_edit_filters_and_access_control_success(api, user, tagfilters, cus
     check(resp['access_control'], 'defined_domain_permissions', list)
     check(custom_tagvalue, 'filters', dict, allow_none=True)
     assert resp['access_control']['all_users_permissions'] == []
-    assert not any(v['id'] == user['uuid']
-                   for v in resp['access_control']['current_domain_permissions'])
+    assert all(
+        v['id'] != user['uuid']
+        for v in resp['access_control']['current_domain_permissions']
+    )
+
     assert resp['filters'] == {
         'asset': '{"and":[{"field":"ipv4","operator":"eq","value":"127.0.0.1"}]}'}
     assert resp['access_control']['version'] == 1
@@ -1076,7 +1079,4 @@ def test_tags_edit_without_filters(api):
 
 def tag_exists(api, tag_uuid):
     '''function to check whether the tag value exists or not '''
-    if tag_uuid in api.tags.list():
-        return True
-    else:
-        return False
+    return tag_uuid in api.tags.list()

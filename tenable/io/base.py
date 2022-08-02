@@ -34,7 +34,7 @@ class TIOEndpoint(APIEndpoint):
                 The query parameters in the anticipated dictionary format to
                 feed to requests.
         '''
-        resp = dict()
+        resp = {}
 
         for f in finput:
             # First we need to validate the inputs are correct.  We will do that
@@ -42,11 +42,15 @@ class TIOEndpoint(APIEndpoint):
             # the operators and values to make sure that the input is expected.
             fname = self._check('filter_name', f[0], str)
             if f[0] not in filterset:
-                raise UnexpectedValueError(
-                    '{} is not a filterable option'.format(f[0]))
+                raise UnexpectedValueError(f'{f[0]} is not a filterable option')
 
-            foper = self._check('filter_operator', f[1], str,
-                choices=filterset.get(f[0], dict()).get('operators'))
+            foper = self._check(
+                'filter_operator',
+                f[1],
+                str,
+                choices=filterset.get(f[0], {}).get('operators'),
+            )
+
 
             if isinstance(f[2], str):
                 rval = f[2].split(',')
@@ -55,9 +59,14 @@ class TIOEndpoint(APIEndpoint):
             else:
                 raise TypeError('filter_value is not a valid type.')
 
-            fval = self._check('filter_value', rval, list,
-                choices=filterset.get(f[0], dict()).get('choices'),
-                pattern=filterset.get(f[0], dict()).get('pattern'))
+            fval = self._check(
+                'filter_value',
+                rval,
+                list,
+                choices=filterset.get(f[0], {}).get('choices'),
+                pattern=filterset.get(f[0], {}).get('pattern'),
+            )
+
             if rtype not in ['accessgroup']:
                 fval = ','.join(fval)
 
@@ -65,14 +74,14 @@ class TIOEndpoint(APIEndpoint):
                 # For the serialized JSON format, we will need to generate the
                 # expanded input for each filter
                 i = finput.index(f)
-                resp['filter.{}.filter'.format(i)] = fname
-                resp['filter.{}.quality'.format(i)] = foper
-                resp['filter.{}.value'.format(i)] = fval
+                resp[f'filter.{i}.filter'] = fname
+                resp[f'filter.{i}.quality'] = foper
+                resp[f'filter.{i}.value'] = fval
             elif rtype == 'json':
                 # for standard JSON formats, we will simply build a 'filters'
                 # list and store the information there.
                 if 'filters' not in resp:
-                    resp['filters'] = list()
+                    resp['filters'] = []
                 resp['filters'].append({
                     'filter': fname,
                     'quality': foper,
@@ -82,14 +91,14 @@ class TIOEndpoint(APIEndpoint):
                 # for the colon-delimited format, we simply need to generate the
                 # filter as NAME:OPER:VAL and dump it all into a field named f.
                 if 'f' not in resp:
-                    resp['f'] = list()
-                resp['f'].append('{}:{}:{}'.format(fname, foper, fval))
+                    resp['f'] = []
+                resp['f'].append(f'{fname}:{foper}:{fval}')
             elif rtype == 'accessgroup':
                 # For the access group format, we will instead use the format of
                 # "terms", "type", and "operator".  Further all terms must be a
                 # list of strings.
                 if 'rules' not in resp:
-                    resp['rules'] = list()
+                    resp['rules'] = []
                 resp['rules'].append({
                     'operator': foper,
                     'terms': fval,
@@ -100,7 +109,7 @@ class TIOEndpoint(APIEndpoint):
                 # "field", "operator", and "value".  Further all terms must be a
                 # list of strings.
                 if 'asset' not in resp:
-                    resp['asset'] = list()
+                    resp['asset'] = []
                 resp['asset'].append({
                     'field': fname,
                     'operator': foper,

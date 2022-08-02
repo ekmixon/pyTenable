@@ -172,11 +172,7 @@ class TenableIO(APIPlatform):  # noqa: PLR0904
         If the call is retried, we will need to set some additional headers
         '''
         kwargs['headers'] = kwargs.get('headers', {})
-        # if the request uuid exists in the response, then we will send the
-        # uuid back so that there is solid request chain in the Tenable.io
-        # platform logs.
-        request_uuid = response.headers.get('X-Tio-Last-Request-Uuid')
-        if request_uuid:
+        if request_uuid := response.headers.get('X-Tio-Last-Request-Uuid'):
             kwargs['headers']['X-Tio-Last-Request-Uuid'] = request_uuid
 
         # We also need to return the number of times that we have attempted to

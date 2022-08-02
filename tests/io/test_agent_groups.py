@@ -22,7 +22,6 @@ def agentgroup(request, api):
             api.agent_groups.delete(group['id'])
         except NotFoundError as err:
             log_exception(err)
-            pass
 
     request.addfinalizer(teardown)
     return group

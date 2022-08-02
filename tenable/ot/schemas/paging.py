@@ -38,24 +38,18 @@ class PaginationFilterSchema(BaseFilterRuleSchema):
         '''
         Performs the conversion of 1 or many filter rules.
         '''
-        rules = dict()
-
         # if only a single filter was passed, then wrap it in a list as we will
         # be using the index of the list.
         if not kwargs.get('many'):
             data = [data]
 
-        # process each rule and then merge the results into the rules dict.
-        for idx, rule in enumerate(data):
-            # if a name parameter exists, then we will use the filter name
-            # specified within the the filter specification.  If none exists,
-            # then we will simply use the name we have on hand.
-            rules[self.filters[rule['name']].get('name', rule['name'])] = {
+        # return the rules dict back to the caller.
+        return {
+            self.filters[rule['name']].get('name', rule['name']): {
                 rule['oper']: rule['value']
             }
-
-        # return the rules dict back to the caller.
-        return rules
+            for rule in data
+        }
 
 
 class PaginationOrderSchema(Schema):

@@ -84,10 +84,8 @@ def test_io_compile(api):
         UsersAPI(api)
         WorkbenchesAPI(api)
     except NameError as error:
-        print('\n The following name error exists: {}'.format(error))
+        print(f'\n The following name error exists: {error}')
         pytest.raises(NameError)
-        assert True
     except UnexpectedValueError as error:
-        print('\n The following value error exists: {}'.format(error))
+        print(f'\n The following value error exists: {error}')
         pytest.raises(UnexpectedValueError)
-        assert True

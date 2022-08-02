@@ -49,4 +49,4 @@ class NetworkInterfacesAPI(APIEndpoint):
         Example:
             >>> ot.network_interfaces.connections(id)
         '''
-        return self._get('{}/connections'.format(id), box=BoxList)
+        return self._get(f'{id}/connections', box=BoxList)

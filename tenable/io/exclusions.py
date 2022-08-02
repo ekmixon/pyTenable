@@ -151,9 +151,14 @@ class ExclusionsAPI(TIOEndpoint):
         # if the frequency is monthly, then we will need to specify the day of
         # the month that the rule will run on.
         if frequency == 'MONTHLY':
-            rrules['bymonthday'] = self._check('day_of_month', day_of_month, int,
-                choices=list(range(1,32)),
-                default=datetime.today().day)
+            rrules['bymonthday'] = self._check(
+                'day_of_month',
+                day_of_month,
+                int,
+                choices=list(range(1, 32)),
+                default=datetime.now().day,
+            )
+
 
         # construct payload schedule based on enable
         if enabled is True:
@@ -201,7 +206,9 @@ class ExclusionsAPI(TIOEndpoint):
         Examples:
             >>> tio.exclusions.delete(1)
         '''
-        self._api.delete('exclusions/{}'.format(self._check('exclusion_id', exclusion_id, int)))
+        self._api.delete(
+            f"exclusions/{self._check('exclusion_id', exclusion_id, int)}"
+        )
 
     def details(self, exclusion_id):
         '''
@@ -221,7 +228,8 @@ class ExclusionsAPI(TIOEndpoint):
             >>> pprint(exclusion)
         '''
         return self._api.get(
-            'exclusions/{}'.format(self._check('exclusion_id', exclusion_id, int))).json()
+            f"exclusions/{self._check('exclusion_id', exclusion_id, int)}"
+        ).json()
 
     def edit(self, exclusion_id, name=None, members=None, start_time=None,
              end_time=None, timezone=None, description=None, frequency=None,
@@ -324,9 +332,17 @@ class ExclusionsAPI(TIOEndpoint):
 
             if frequency == 'MONTHLY':
                 rrules['bymonthday'] = self._check(
-                    'day_of_month', day_of_month, int, choices=list(range(1, 32)),
-                    default=payload['schedule']['rrules'].get('bymonthday', datetime.today().day)
-                    if payload['schedule']['rrules'] is not None else datetime.today().day)
+                    'day_of_month',
+                    day_of_month,
+                    int,
+                    choices=list(range(1, 32)),
+                    default=payload['schedule']['rrules'].get(
+                        'bymonthday', datetime.now().day
+                    )
+                    if payload['schedule']['rrules'] is not None
+                    else datetime.now().day,
+                )
+
 
             # update new rrules in existing payload
             if payload['schedule']['rrules'] is not None:
@@ -356,9 +372,9 @@ class ExclusionsAPI(TIOEndpoint):
         # integers as the API documentation requests and if we don't raise an
         # error, then lets make the call.
         return self._api.put(
-            'exclusions/{}'.format(
-                self._check('exclusion_id', exclusion_id, int)
-            ), json=payload).json()
+            f"exclusions/{self._check('exclusion_id', exclusion_id, int)}",
+            json=payload,
+        ).json()
 
     def list(self):
         '''

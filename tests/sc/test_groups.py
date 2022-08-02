@@ -102,7 +102,7 @@ def test_groups_create_success(security_center, group):
             check(group, 'description', str)
             if key == 'lces':
                 check(group, 'version', str)
-            if key == 'repositories':
+            elif key == 'repositories':
                 check(group, 'lastVulnUpdate', str)
                 check(group, 'type', str)
                 check(group, 'dataFormat', str)

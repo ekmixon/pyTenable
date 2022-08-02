@@ -48,7 +48,7 @@ class CredentialsAPI(TIOEndpoint):
         Validates and/or transforms thew permissions items into the desired
         format.  If a dict it will validate.  If a tuple, will convert.
         '''
-        resp = list()
+        resp = []
         for p in permissions:
             if isinstance(p, tuple):
                 # if the item is a tuple, lets validate it and convert it into
@@ -131,7 +131,7 @@ class CredentialsAPI(TIOEndpoint):
             ...     custom_password_prompt='')
         '''
         if not permissions:
-            permissions = list()
+            permissions = []
 
         return self._api.post('credentials', json={
             'name': self._check('cred_name', cred_name, str),
@@ -196,8 +196,9 @@ class CredentialsAPI(TIOEndpoint):
             payload['permissions'] = self._permissions_constructor(permissions)
         payload['settings'] = dict_merge(current['settings'], settings)
 
-        return self._api.put('credentials/{}'.format(cred_uuid),
-            json=payload).json()['updated']
+        return self._api.put(f'credentials/{cred_uuid}', json=payload).json()[
+            'updated'
+        ]
 
     def details(self, id):
         '''
@@ -216,8 +217,7 @@ class CredentialsAPI(TIOEndpoint):
             >>> cred_uuid = '00000000-0000-0000-0000-000000000000'
             >>> cred = tio.credentials.details(cred_uuid)
         '''
-        return self._api.get('credentials/{}'.format(
-            self._check('id', id, 'uuid'))).json()
+        return self._api.get(f"credentials/{self._check('id', id, 'uuid')}").json()
 
     def delete(self, id):
         '''
@@ -236,8 +236,9 @@ class CredentialsAPI(TIOEndpoint):
             >>> cred_uuid = '00000000-0000-0000-0000-000000000000'
             >>> cred = tio.credentials.delete(cred_uuid)
         '''
-        return self._api.delete('credentials/{}'.format(
-            self._check('id', id, 'uuid'))).json()['deleted']
+        return self._api.delete(
+            f"credentials/{self._check('id', id, 'uuid')}"
+        ).json()['deleted']
 
     def types(self):
         '''

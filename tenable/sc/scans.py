@@ -215,7 +215,7 @@ class ScanAPI(SCEndpoint):
             >>> for scan in sc.scans.list():
             ...     pprint(scan)
         '''
-        params = dict()
+        params = {}
         if fields:
             params['fields'] = ','.join([self._check('field', f, str)
                 for f in fields])
@@ -329,12 +329,13 @@ class ScanAPI(SCEndpoint):
             >>> scan = sc.scans.detail(1)
             >>> pprint(scan)
         '''
-        params = dict()
+        params = {}
         if fields:
             params['fields'] = ','.join([self._check('field', f, str) for f in fields])
 
-        return self._api.get('scan/{}'.format(self._check('id', id, int)),
-            params=params).json()['response']
+        return self._api.get(
+            f"scan/{self._check('id', id, int)}", params=params
+        ).json()['response']
 
     def edit(self, id, **kw):
         '''
@@ -404,8 +405,9 @@ class ScanAPI(SCEndpoint):
             >>> sc.scans.edit(1, name='Example scan')
         '''
         scan = self._constructor(**kw)
-        return self._api.patch('scan/{}'.format(self._check('id', id, int)),
-            json=scan).json()['response']
+        return self._api.patch(
+            f"scan/{self._check('id', id, int)}", json=scan
+        ).json()['response']
 
     def delete(self, id):
         '''
@@ -423,8 +425,9 @@ class ScanAPI(SCEndpoint):
         Examples:
             >>> sc.scans.delete(1)
         '''
-        return self._api.delete('scan/{}'.format(self._check('id', id, int))
-            ).json()['response']
+        return self._api.delete(f"scan/{self._check('id', id, int)}").json()[
+            'response'
+        ]
 
     def copy(self, id, name, user_id):
         '''
@@ -450,8 +453,9 @@ class ScanAPI(SCEndpoint):
             'targetUser': {'id': self._check('user_id', user_id, int)}
         }
 
-        return self._api.post('scan/{}/copy'.format(
-            self._check('id', id, int)), json=payload).json()['response']['scan']
+        return self._api.post(
+            f"scan/{self._check('id', id, int)}/copy", json=payload
+        ).json()['response']['scan']
 
     def launch(self, id, diagnostic_target=None, diagnostic_password=None):
         '''
@@ -479,12 +483,13 @@ class ScanAPI(SCEndpoint):
             >>> print('The Scan Result ID is {}'.format(
             ...     running['scanResult']['id']))
         '''
-        payload = dict()
+        payload = {}
         if diagnostic_target and diagnostic_password:
             payload['diagnosticTarget'] = self._check(
                 'diagnostic_target', diagnostic_target, str)
             payload['diagnosticPassword'] = self._check(
                 'diagnostic_password', diagnostic_password, str)
 
-        return self._api.post('scan/{}/launch'.format(
-            self._check('id', id, int)), json=payload).json()['response']
+        return self._api.post(
+            f"scan/{self._check('id', id, int)}/launch", json=payload
+        ).json()['response']

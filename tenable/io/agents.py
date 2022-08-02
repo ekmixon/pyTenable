@@ -157,13 +157,14 @@ class AgentsAPI(TIOEndpoint):
             query['wf'] = ','.join(kw['wildcard_fields'])
 
         # Return the Iterator.
-        return AgentsIterator(self._api,
+        return AgentsIterator(
+            self._api,
             _limit=limit,
             _offset=offset,
             _pages_total=pages,
             _query=query,
-            _path='scanners/{}/agents'.format(scanner_id),
-            _resource='agents'
+            _path=f'scanners/{scanner_id}/agents',
+            _resource='agents',
         )
 
     def details(self, agent_id, scanner_id=1):
@@ -187,10 +188,8 @@ class AgentsAPI(TIOEndpoint):
             >>> pprint(agent)
         '''
         return self._api.get(
-            'scanners/{}/agents/{}'.format(
-                self._check('scanner_id', scanner_id, int),
-                self._check('agent_id', agent_id, int)
-            )).json()
+            f"scanners/{self._check('scanner_id', scanner_id, int)}/agents/{self._check('agent_id', agent_id, int)}"
+        ).json()
 
     def unlink(self, *agent_ids, **kw):
         '''
@@ -219,21 +218,21 @@ class AgentsAPI(TIOEndpoint):
 
             >>> tio.agents.unlink(1, 2, 3)
         '''
-        scanner_id = 1
-        if 'scanner_id' in kw:
-            scanner_id = kw['scanner_id']
-
+        scanner_id = kw.get('scanner_id', 1)
         if len(agent_ids) <= 1:
             # as only a singular agent_id was sent over, we can call the delete
             # API
-            self._api.delete('scanners/{}/agents/{}'.format(
-                self._check('scanner_id', scanner_id, int),
-                self._check('agent_id', agent_ids[0], int)
-            ))
+            self._api.delete(
+                f"scanners/{self._check('scanner_id', scanner_id, int)}/agents/{self._check('agent_id', agent_ids[0], int)}"
+            )
+
         else:
-            return self._api.post('scanners/{}/agents/_bulk/unlink'.format(
-                self._check('scanner_id', scanner_id, int)),
-                json={'items': [self._check('agent_ids', i, int) for i in agent_ids]}).json()
+            return self._api.post(
+                f"scanners/{self._check('scanner_id', scanner_id, int)}/agents/_bulk/unlink",
+                json={
+                    'items': [self._check('agent_ids', i, int) for i in agent_ids]
+                },
+            ).json()
 
     def task_status(self, task_uuid, scanner_id=1):
         '''
@@ -255,7 +254,5 @@ class AgentsAPI(TIOEndpoint):
             >>> pprint(task)
         '''
         return self._api.get(
-            'scanners/{}/agents/_bulk/{}'.format(
-                self._check('scanner_id', scanner_id, int),
-                self._check('task_uuid', task_uuid, 'uuid')
-            )).json()
+            f"scanners/{self._check('scanner_id', scanner_id, int)}/agents/_bulk/{self._check('task_uuid', task_uuid, 'uuid')}"
+        ).json()

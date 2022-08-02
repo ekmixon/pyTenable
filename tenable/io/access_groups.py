@@ -51,7 +51,7 @@ class AccessGroupsAPI(TIOEndpoint):
         Simple principle tuple expander.  Also supports validating principle
         dictionaries for transparent passthrough.
         '''
-        resp = list()
+        resp = []
         for item in items:
             self._check('principal', item, (tuple, dict))
             if isinstance(item, tuple):
@@ -136,7 +136,7 @@ class AccessGroupsAPI(TIOEndpoint):
             ... ])
         '''
         if not principals:
-            principals = list()
+            principals = []
 
         # construct the payload dictionary
         payload = {
@@ -223,8 +223,7 @@ class AccessGroupsAPI(TIOEndpoint):
             payload['principals'] = group['principals']
 
         # call the API endpoint and return the response to the caller.
-        return self._api.put('access-groups/{}'.format(group_id),
-            json=payload).json()
+        return self._api.put(f'access-groups/{group_id}', json=payload).json()
 
     def delete(self, group_id):
         '''
@@ -235,8 +234,7 @@ class AccessGroupsAPI(TIOEndpoint):
         Args:
             group_id (str): The UUID of the access group to remove.
         '''
-        self._api.delete('access-groups/{}'.format(
-            self._check('group_id', group_id, 'uuid')))
+        self._api.delete(f"access-groups/{self._check('group_id', group_id, 'uuid')}")
 
     def details(self, group_id):
         '''
@@ -247,8 +245,9 @@ class AccessGroupsAPI(TIOEndpoint):
         Args:
             group_id (str): The UUID of the access group.
         '''
-        return self._api.get('access-groups/{}'.format(
-            self._check('group_id', group_id, 'uuid'))).json()
+        return self._api.get(
+            f"access-groups/{self._check('group_id', group_id, 'uuid')}"
+        ).json()
 
     def list(self, *filters, **kw):
         '''

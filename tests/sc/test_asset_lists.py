@@ -457,14 +457,16 @@ def test_asset_lists_constructor_success(security_center):
         tags='tag',
         template=1,
         filename='fobj',
-        data_fields=list(),
-        combinations=dict(),
-        rules=dict(),
+        data_fields=[],
+        combinations={},
+        rules={},
         dns_names=['name1', 'name2'],
         dn='company.tld',
         search_string='*',
         ldap_id=1,
-        ips=['192.168.0.1', ],
+        ips=[
+            '192.168.0.1',
+        ],
         source_type='type',
         exclude_managed_ips=True,
         filters=[('name', 'eq', 'value')],
@@ -475,8 +477,9 @@ def test_asset_lists_constructor_success(security_center):
         lce_id=1,
         sort_field='field',
         sort_dir='asc',
-        scan_id=1
+        scan_id=1,
     )
+
     assert resp == {
         'name': 'name',
         'description': 'description',

@@ -183,8 +183,14 @@ def remediationscan(request, api):
 @pytest.fixture
 def scan_results(api):
     '''fixture to get the scan results'''
-    scan_list = [id['id'] for id in list(filter(lambda value: value['status'] == 'completed', api.scans.list()))]
-    if scan_list:
+    if scan_list := [
+        id['id']
+        for id in list(
+            filter(
+                lambda value: value['status'] == 'completed', api.scans.list()
+            )
+        )
+    ]:
         return {'results': api.scans.results(scan_list[0]), 'id': scan_list[0]}
     raise NotFoundError("Scan not found")
 

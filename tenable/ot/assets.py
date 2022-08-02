@@ -78,4 +78,4 @@ class AssetsAPI(APIEndpoint):
         Example:
             >>> connections = ot.assets.connections(id)
         '''
-        return self._get('{}/connections'.format(id), box=BoxList)
+        return self._get(f'{id}/connections', box=BoxList)

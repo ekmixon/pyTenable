@@ -254,12 +254,13 @@ class UserAPI(SCEndpoint):
             >>> user = sc.users.details(1)
             >>> pprint(user)
         '''
-        params = dict()
+        params = {}
         if fields:
             params['fields'] = ','.join([self._check('field', f, str) for f in fields])
 
-        return self._api.get('user/{}'.format(self._check('id', id, int)),
-            params=params).json()['response']
+        return self._api.get(
+            f"user/{self._check('id', id, int)}", params=params
+        ).json()['response']
 
     def edit(self, id, **kw):
         '''
@@ -350,8 +351,9 @@ class UserAPI(SCEndpoint):
             >>> user = sc.users.edit(1, username='newusername')
         '''
         payload = self._constructor(**kw)
-        return self._api.patch('user/{}'.format(
-            self._check('id', id, int)), json=payload).json()['response']
+        return self._api.patch(
+            f"user/{self._check('id', id, int)}", json=payload
+        ).json()['response']
 
     def delete(self, id):
         '''
@@ -369,8 +371,9 @@ class UserAPI(SCEndpoint):
         Examples:
             >>> sc.users.delete(1)
         '''
-        return self._api.delete('user/{}'.format(
-            self._check('id', id, int))).json()['response']
+        return self._api.delete(f"user/{self._check('id', id, int)}").json()[
+            'response'
+        ]
 
     def list(self, fields=None):
         '''
@@ -390,7 +393,7 @@ class UserAPI(SCEndpoint):
             >>> for user in sc.users.list():
             ...     pprint(user)
         '''
-        params = dict()
+        params = {}
         if fields:
             params['fields'] = ','.join([self._check('field', f, str)
                 for f in fields])

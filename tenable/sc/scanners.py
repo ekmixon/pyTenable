@@ -188,12 +188,13 @@ class ScannerAPI(SCEndpoint):
             >>> scanner = sc.scanners.details(1)
             >>> pprint(scanner)
         '''
-        params = dict()
+        params = {}
         if fields:
             params['fields'] = ','.join([self._check('field', f, str) for f in fields])
 
-        return self._api.get('scanner/{}'.format(self._check('id', id, int)),
-            params=params).json()['response']
+        return self._api.get(
+            f"scanner/{self._check('id', id, int)}", params=params
+        ).json()['response']
 
     def edit(self, id, **kw):
         '''
@@ -237,8 +238,7 @@ class ScannerAPI(SCEndpoint):
             >>> scanner = sc.scanners.edit(1, enabled=True)
         '''
         payload = self._constructor(**kw)
-        return self._api.patch('scanner/{}'.format(id),
-            json=payload).json()['response']
+        return self._api.patch(f'scanner/{id}', json=payload).json()['response']
 
     def delete(self, id):
         '''
@@ -256,8 +256,9 @@ class ScannerAPI(SCEndpoint):
         Examples:
             >>> sc.scanners.delete(1)
         '''
-        return self._api.delete('scanner/{}'.format(
-            self._check('id', id, int))).json()['response']
+        return self._api.delete(f"scanner/{self._check('id', id, int)}").json()[
+            'response'
+        ]
 
     def list(self, fields=None):
         '''
@@ -277,7 +278,7 @@ class ScannerAPI(SCEndpoint):
             >>> for scanner in sc.scanners.list():
             ...     pprint(scanner)
         '''
-        params = dict()
+        params = {}
         if fields:
             params['fields'] = ','.join([self._check('field', f, str)
                 for f in fields])
@@ -309,8 +310,9 @@ class ScannerAPI(SCEndpoint):
         if results:
             payload['resultsSync'] = [{'id': self._check('results:id', i, int)}
                 for i in self._check('results', results, list)]
-        return self._api.post('scanner/{}/testScansQuery'.format(
-            self._check('id', id, int)), json=payload).json()['response']
+        return self._api.post(
+            f"scanner/{self._check('id', id, int)}/testScansQuery", json=payload
+        ).json()['response']
 
     def update_status(self):
         '''

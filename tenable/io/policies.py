@@ -31,10 +31,10 @@ class PoliciesAPI(TIOEndpoint):
         define scan policy templates w/o having to remember the UUID for each
         individual one.
         '''
-        policies = dict()
-        for item in self._api.editor.template_list('policy'):
-            policies[item['name']] = item['uuid']
-        return policies
+        return {
+            item['name']: item['uuid']
+            for item in self._api.editor.template_list('policy')
+        }
 
     def template_details(self, name):
         '''
@@ -142,8 +142,10 @@ class PoliciesAPI(TIOEndpoint):
             >>> policy['settings']['name'] = 'Updated Policy Name'
             >>> tio.policies.configure(policy)
         '''
-        self._api.put('policies/{}'.format(self._check('id', id, int)),
-            json=self._check('policy', policy, dict))
+        self._api.put(
+            f"policies/{self._check('id', id, int)}",
+            json=self._check('policy', policy, dict),
+        )
 
     def copy(self, id):
         '''
@@ -161,8 +163,7 @@ class PoliciesAPI(TIOEndpoint):
         Example:
             >>> policy = tio.policies.copy(1)
         '''
-        return self._api.post('policies/{}/copy'.format(
-            self._check('id', id, int))).json()
+        return self._api.post(f"policies/{self._check('id', id, int)}/copy").json()
 
     def create(self, policy):
         '''
@@ -204,7 +205,7 @@ class PoliciesAPI(TIOEndpoint):
         Examples:
             >>> tio.policies.delete(1)
         '''
-        self._api.delete('policies/{}'.format(self._check('id', id, int)))
+        self._api.delete(f"policies/{self._check('id', id, int)}")
 
     def details(self, id):
         '''
@@ -222,8 +223,7 @@ class PoliciesAPI(TIOEndpoint):
         Examples:
             >>> policy = tio.policies.details(1)
         '''
-        return self._api.get('policies/{}'.format(
-            self._check('id', id, int))).json()
+        return self._api.get(f"policies/{self._check('id', id, int)}").json()
 
     def policy_import(self, fobj):
         '''
@@ -274,8 +274,10 @@ class PoliciesAPI(TIOEndpoint):
             fobj = BytesIO()
 
         # make the call to get the file.
-        resp = self._api.get('policies/{}/export'.format(
-            self._check('id', id, int)), stream=True)
+        resp = self._api.get(
+            f"policies/{self._check('id', id, int)}/export", stream=True
+        )
+
 
         # Stream the data into the file.
         for chunk in resp.iter_content(chunk_size=1024):

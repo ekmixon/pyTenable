@@ -5,7 +5,7 @@ def policy_settings(item):
     Recursive function to attempt to pull out the various settings from scan
     policy settings in the editor format.
     '''
-    resp = dict()
+    resp = {}
     if 'id' in item and ('default' in item
         or ('type' in item and item['type'] in [
             'file',
@@ -17,7 +17,7 @@ def policy_settings(item):
         # if we find both an 'id' and a 'default' attribute, or if we find
         # a 'type' attribute matching one of the known attribute types, then
         # we will parse out the data and append it to the response dictionary
-        if not 'default' in item:
+        if 'default' not in item:
             item['default'] = ""
         resp[item['id']] = item['default']
 

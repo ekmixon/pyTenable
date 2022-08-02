@@ -78,14 +78,13 @@ class RemediationScansAPI(TIOEndpoint):
             on the developer portal.
 
             '''
-        params = dict()
+        params = {}
         pages = None
         if limit>0 and limit < 200:
             params['limit'] = self._check('limit', limit, int)
         if offset >= 0:
             params['offset'] = self._check('offset', offset, int)
-        if 'scan_creation_date:asc' or 'scan_creation_date:desc' in sortval:
-            params['sort'] = self._check('sort', sortval, str)
+        params['sort'] = self._check('sort', sortval, str)
 
         return RemediationScansIteratorV2(self._api,
         _limit=limit,
@@ -197,9 +196,7 @@ class RemediationScansAPI(TIOEndpoint):
                 The resulting scan document based on the kwargs provided.
 
         '''
-        scan = {
-            'settings': dict(),
-        }
+        scan = {'settings': {}}
 
         # If a template is specified, then we will pull the listing of available
         # templates and set the policy UUID to match the template name given.
@@ -268,7 +265,7 @@ class RemediationScansAPI(TIOEndpoint):
         # For credentials, we will simply push the dictionary as-is into the
         # the credentials.add sub-document.
         if 'credentials' in kwargs:
-            scan['credentials'] = {'add': dict()}
+            scan['credentials'] = {'add': {}}
             scan['credentials']['add'] = self._check(
                 'credentials', kwargs['credentials'], dict)
             del kwargs['credentials']

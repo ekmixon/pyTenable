@@ -50,11 +50,12 @@ class ScanResultAPI(SCEndpoint):
         Examples:
             >>> sc.scan_instances.copy(1)
         '''
-        payload = dict()
+        payload = {}
         if users:
             payload['users'] = [{'id': self._check('user:id', u, int)} for u in users]
-        return self._api.post('scanResult/{}/copy'.format(
-            self._check('id', id, int)), json=payload).json()['response']
+        return self._api.post(
+            f"scanResult/{self._check('id', id, int)}/copy", json=payload
+        ).json()['response']
 
     def delete(self, id):
         '''
@@ -72,8 +73,9 @@ class ScanResultAPI(SCEndpoint):
         Examples:
             >>> sc.scan_instances.delete(1)
         '''
-        return self._api.delete('scanResult/{}'.format(
-            self._check('id', id, int))).json()['response']
+        return self._api.delete(f"scanResult/{self._check('id', id, int)}").json()[
+            'response'
+        ]
 
     def details(self, id, fields=None):
         '''
@@ -104,12 +106,13 @@ class ScanResultAPI(SCEndpoint):
             ...     fields=['name', 'status', 'scannedIPs', 'startTime', 'finishTime'])
             >>> pprint(scan)
         '''
-        params = dict()
+        params = {}
         if fields:
             params['fields'] = ','.join([self._check('field', f, str)
                 for f in self._check('fields', fields, list)])
-        return self._api.get('scanResult/{}'.format(self._check('id', id, int)),
-            params=params).json()['response']
+        return self._api.get(
+            f"scanResult/{self._check('id', id, int)}", params=params
+        ).json()['response']
 
     def email(self, id, *emails):
         '''
@@ -129,9 +132,12 @@ class ScanResultAPI(SCEndpoint):
         Examples:
             >>> sc.scan_instances.email(1, 'email@company.tld')
         '''
-        return self._api.post('scanResult/{}/email'.format(
-            self._check('id', id, int)), json={'email': ','.join(
-                [self._check('address', e, str) for e in emails])}).json()['response']
+        return self._api.post(
+            f"scanResult/{self._check('id', id, int)}/email",
+            json={
+                'email': ','.join([self._check('address', e, str) for e in emails])
+            },
+        ).json()['response']
 
     def export_scan(self, id, fobj=None, export_format=None):
         '''
@@ -161,10 +167,20 @@ class ScanResultAPI(SCEndpoint):
             >>> with open('example.zip', 'wb') as fobj:
             ...     sc.scan_instances.export_scan(1, fobj)
         '''
-        resp = self._api.post('scanResult/{}/download'.format(
-            self._check('id', id, int)), stream=True, json={
-                'downloadType': self._check('export_format', export_format, str,
-                    choices=['scap1_2', 'v2'], default='v2')})
+        resp = self._api.post(
+            f"scanResult/{self._check('id', id, int)}/download",
+            stream=True,
+            json={
+                'downloadType': self._check(
+                    'export_format',
+                    export_format,
+                    str,
+                    choices=['scap1_2', 'v2'],
+                    default='v2',
+                )
+            },
+        )
+
 
         # if no file-like object was passed, then we will instantiate a BytesIO
         # object to push the file into.

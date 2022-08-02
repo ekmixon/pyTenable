@@ -45,8 +45,8 @@ class ExportsIterator(APIResultsIterator):
         self.uuid = None
         self.chunk_id = None
         self.timeout = None
-        self.chunks = list()
-        self.processed = list()
+        self.chunks = []
+        self.processed = []
         self._wait_for_complete = False
         APIResultsIterator.__init__(self, api, **kw)
 
@@ -68,7 +68,12 @@ class ExportsIterator(APIResultsIterator):
 
             # We need to get the list of chunks that we haven't completed yet and are
             # available for download.
-            unfinished = [c for c in status.get('chunks_available', list()) if c not in self.processed]
+            unfinished = [
+                c
+                for c in status.get('chunks_available', [])
+                if c not in self.processed
+            ]
+
 
             # Add the chunks_unfinished key with the unfinished list as the
             # associated value and then return the status to the caller.
@@ -81,7 +86,7 @@ class ExportsIterator(APIResultsIterator):
                 raise StopIteration()
 
             if status['status'] != 'FINISHED' and self._wait_for_complete:
-                status['chunks_unfinished'] = list()
+                status['chunks_unfinished'] = []
 
             if status['status'] == 'ERROR':
                 raise TioExportsError(self.type, self.uuid)
@@ -104,7 +109,7 @@ class ExportsIterator(APIResultsIterator):
             # status once a second until we get something else to work on.
             while len(status['chunks_unfinished']) < 1:
                 backoff_counter += 1
-                time.sleep(backoff_counter if backoff_counter < 30 else 30)
+                time.sleep(min(backoff_counter, 30))
                 status = get_status()
 
             # now that we have some chunks to work on, lets refresh the local
@@ -132,7 +137,7 @@ class ExportsIterator(APIResultsIterator):
                 log_message = 'Invalid Chunk {} on export {}'.format(
                                str(self.chunk_id), str(self.uuid))
                 self._log.warning(log_message)
-                self.page = list()
+                self.page = []
                 counter += 1
 
         # If the chunk of data is empty, then we will call ourselves to get the
@@ -165,7 +170,7 @@ class ExportsIterator(APIResultsIterator):
         '''
         Cancels the export.
         '''
-        self._api.get('{}/export/{}/cancel'.format(self.type, self.uuid)).json()
+        self._api.get(f'{self.type}/export/{self.uuid}/cancel').json()
 
 
 class ExportsAPI(TIOEndpoint):
@@ -267,7 +272,7 @@ class ExportsAPI(TIOEndpoint):
             ...     pprint(vuln)
         '''
         uuid = kw.get('uuid')
-        payload = {'filters': dict()}
+        payload = {'filters': {}}
 
         # Instead of a long and drawn-out series of if statements for all of
         # these integer filters, lets instead just loop through all of them
@@ -280,8 +285,10 @@ class ExportsAPI(TIOEndpoint):
             if self._check(option, kw.get(option), int) is not None:
                 payload['filters'][option] = kw[option]
 
-        payload['num_assets'] = str(self._check('num_assets',
-            kw['num_assets'] if 'num_assets' in kw else None, int, default=500))
+        payload['num_assets'] = str(
+            self._check('num_assets', kw.get('num_assets', None), int, default=500)
+        )
+
 
         if self._check('include_unlicensed', kw.get('include_unlicensed'), bool):
             payload['include_unlicensed'] = kw.get('include_unlicensed')
@@ -313,7 +320,7 @@ class ExportsAPI(TIOEndpoint):
             try:
                 network = IPv4Network(cidr)
             except ValueError:
-                raise UnexpectedValueError('{} is not a valid CIDR'.format(cidr))
+                raise UnexpectedValueError(f'{cidr} is not a valid CIDR')
 
             # Assuming everything has passed, then we will add the filter to the
             # filters dictionary.
@@ -326,13 +333,12 @@ class ExportsAPI(TIOEndpoint):
                 # check to see if the tag is a tuple and also construct the
                 # filter name.
                 self._check('tags:tag', tag, tuple)
-                name = 'tag.{}'.format(
-                    self._check('tag:name', tag[0], str))
+                name = f"tag.{self._check('tag:name', tag[0], str)}"
 
                 # If the tag filter doesn't yet exist, then we need to create it
                 # and associate an empty list to it.
                 if name not in payload['filters']:
-                    payload['filters'][name] = list()
+                    payload['filters'][name] = []
 
                 # add the tag value to the tag filter.
                 payload['filters'][name].append(
@@ -344,7 +350,7 @@ class ExportsAPI(TIOEndpoint):
         if not uuid:
             uuid = self._api.post(
                 'vulns/export', json=payload).json()['export_uuid']
-            self._api._log.debug('Initiated vuln export {}'.format(uuid))
+            self._api._log.debug(f'Initiated vuln export {uuid}')
 
         return ExportsIterator(self._api,
             type='vulns',
@@ -441,11 +447,12 @@ class ExportsAPI(TIOEndpoint):
             ...     pprint(asset)
         '''
         uuid = kw.get('uuid')
-        payload = {'filters': dict()}
-        payload['chunk_size'] = self._check('chunk_size',
-            kw['chunk_size'] if 'chunk_size' in kw else None,
-            int, default=1000)
-
+        payload = {
+            'filters': {},
+            'chunk_size': self._check(
+                'chunk_size', kw.get('chunk_size', None), int, default=1000
+            ),
+        }
 
         # Instead of a long and drawn-out series of if statements for all of
         # these integer filters, lets instead just loop through all of them
@@ -474,13 +481,12 @@ class ExportsAPI(TIOEndpoint):
                 # check to see if the tag is a tuple and also construct the
                 # filter name.
                 self._check('tags:tag', tag, tuple)
-                name = 'tag.{}'.format(
-                    self._check('tag:name', tag[0], str))
+                name = f"tag.{self._check('tag:name', tag[0], str)}"
 
                 # If the tag filter doesn't yet exist, then we need to create it
                 # and associate an empty list to it.
                 if name not in payload['filters']:
-                    payload['filters'][name] = list()
+                    payload['filters'][name] = []
 
                 # add the tag value to the tag filter.
                 payload['filters'][name].append(
@@ -489,7 +495,7 @@ class ExportsAPI(TIOEndpoint):
         if not uuid:
             uuid = self._api.post(
                 'assets/export', json=payload).json()['export_uuid']
-            self._api._log.debug('Initiated asset export {}'.format(uuid))
+            self._api._log.debug(f'Initiated asset export {uuid}')
         return ExportsIterator(
             self._api,
             type='assets',
@@ -553,7 +559,7 @@ class ExportsAPI(TIOEndpoint):
 
         '''
         # initialize payload
-        payload=dict()
+        payload = {}
         uuid = kw.get('uuid')
 
         # set the number of compliance findings per exported chunk
@@ -573,7 +579,7 @@ class ExportsAPI(TIOEndpoint):
         # set last seen and first seen filters
         # we are checking first seen filter only if last seen is available
         if 'last_seen' in kw:
-            payload['filters'] = dict()
+            payload['filters'] = {}
             payload['filters']['last_seen'] = self._check('last_seen', kw['last_seen'], int)
 
             if 'first_seen' in kw:
@@ -582,7 +588,7 @@ class ExportsAPI(TIOEndpoint):
         if not uuid:
             uuid = self._api.post(
                 'compliance/export', json=payload).json()['export_uuid']
-            self._api._log.debug('Initiated compliance export {}'.format(uuid))
+            self._api._log.debug(f'Initiated compliance export {uuid}')
 
         return ExportsIterator(
             self._api,

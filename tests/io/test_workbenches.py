@@ -276,8 +276,7 @@ def test_workbench_asset_vulns(api):
     '''
     test to get workbench asset vulnerabilities
     '''
-    assets = api.workbenches.assets()
-    if assets:
+    if assets := api.workbenches.assets():
         vulns = api.workbenches.asset_vulns(assets[0]['id'])
         assert isinstance(vulns, list)
         if vulns:
@@ -300,8 +299,7 @@ def test_workbench_asset_vulns_filtered(api):
     '''
     test to get filtered workbench asset vulnerabilities
     '''
-    assets = api.workbenches.assets()
-    if assets:
+    if assets := api.workbenches.assets():
         vulns = api.workbenches.asset_vulns(assets[0]['id'],
             ('severity', 'eq', 'Info'))
         assert isinstance(vulns, list)
@@ -390,8 +388,7 @@ def test_workbench_asset_vuln_info(api):
     '''
     vuln = api.workbenches.vuln_assets()
     if vuln and vuln[0]['ipv4']:
-        vuln_list = api.workbenches.asset_vulns(vuln[0]['id'])
-        if vuln_list:
+        if vuln_list := api.workbenches.asset_vulns(vuln[0]['id']):
             plugin_id = vuln_list[0]['plugin_id']
             info = api.workbenches.asset_vuln_info(vuln[0]['id'], plugin_id)
             check(info, 'accepted_count', int)
@@ -496,8 +493,7 @@ def test_workbench_asset_vuln_output(api):
     '''
     vuln = api.workbenches.vuln_assets()
     if vuln and vuln[0]['ipv4']:
-        vuln_list = api.workbenches.asset_vulns(vuln[0]['id'])
-        if vuln_list:
+        if vuln_list := api.workbenches.asset_vulns(vuln[0]['id']):
             plugin_id = vuln_list[0]['plugin_id']
             outputs = api.workbenches.asset_vuln_output(vuln[0]['id'], plugin_id)
             assert isinstance(outputs, list)
@@ -807,8 +803,7 @@ def test_workbench_vuln_info(api):
     '''
     test to get workbench vulnerability info
     '''
-    vulns = api.workbenches.vulns()
-    if vulns:
+    if vulns := api.workbenches.vulns():
         info = api.workbenches.vuln_info(vulns[0]['plugin_id'])
         assert isinstance(info, dict)
         check(info, 'accepted_count', int)
@@ -883,32 +878,32 @@ def test_workbench_vuln_outputs(api):
     '''
     test to get workbench vulnerability output
     '''
-    vulns = api.workbenches.vulns()
-    if vulns:
-        outputs = api.workbenches.vuln_outputs(vulns[0]['plugin_id'])
-        assert isinstance(outputs, list)
-        if outputs:
-            output = outputs[0]
-            check(output, 'plugin_output', str)
-            check(output, 'states', list)
-            for state in output['states']:
-                check(state, 'name', str)
-                check(state, 'results', list)
-                for result in state['results']:
-                    check(result, 'application_protocol', str, allow_none=True)
-                    check(result, 'assets', list)
-                    for asset in result['assets']:
-                        check(asset, 'first_seen', 'datetime', allow_none=True)
-                        check(asset, 'fqdn', str, allow_none=True)
-                        check(asset, 'hostname', str)
-                        check(asset, 'id', 'uuid')
-                        check(asset, 'ipv4', str, allow_none=True)
-                        check(asset, 'last_seen', 'datetime', allow_none=True)
-                        check(asset, 'netbios_name', str, allow_none=True)
-                        check(asset, 'uuid', 'uuid')
-                    check(result, 'port', int)
-                    check(result, 'severity', int)
-                    check(result, 'transport_protocol', str)
+    if not (vulns := api.workbenches.vulns()):
+        return
+    outputs = api.workbenches.vuln_outputs(vulns[0]['plugin_id'])
+    assert isinstance(outputs, list)
+    if outputs:
+        output = outputs[0]
+        check(output, 'plugin_output', str)
+        check(output, 'states', list)
+        for state in output['states']:
+            check(state, 'name', str)
+            check(state, 'results', list)
+            for result in state['results']:
+                check(result, 'application_protocol', str, allow_none=True)
+                check(result, 'assets', list)
+                for asset in result['assets']:
+                    check(asset, 'first_seen', 'datetime', allow_none=True)
+                    check(asset, 'fqdn', str, allow_none=True)
+                    check(asset, 'hostname', str)
+                    check(asset, 'id', 'uuid')
+                    check(asset, 'ipv4', str, allow_none=True)
+                    check(asset, 'last_seen', 'datetime', allow_none=True)
+                    check(asset, 'netbios_name', str, allow_none=True)
+                    check(asset, 'uuid', 'uuid')
+                check(result, 'port', int)
+                check(result, 'severity', int)
+                check(result, 'transport_protocol', str)
 
 @pytest.mark.vcr()
 def test_workbenches_asset_delete_asset_uuid_typeerror(api):

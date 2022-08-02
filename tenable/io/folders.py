@@ -54,7 +54,7 @@ class FoldersAPI(TIOEndpoint):
         Examples:
             >>> tio.folders.delete(1)
         '''
-        self._api.delete('folders/{}'.format(self._check('id', id, int)))
+        self._api.delete(f"folders/{self._check('id', id, int)}")
 
     def edit(self, id, name):
         '''
@@ -73,9 +73,10 @@ class FoldersAPI(TIOEndpoint):
         Examples:
             >>> tio.folders.edit(1, 'Updated Folder Name')
         '''
-        self._api.put('folders/{}'.format(self._check('id', id, int)), json={
-            'name': self._check('name', name, str)
-        })
+        self._api.put(
+            f"folders/{self._check('id', id, int)}",
+            json={'name': self._check('name', name, str)},
+        )
 
     def list(self):
         '''

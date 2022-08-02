@@ -94,12 +94,13 @@ class ScanZoneAPI(SCEndpoint):
             >>> zone = sc.scan_zones.details(1)
             >>> pprint(zone)
         '''
-        params = dict()
+        params = {}
         if fields:
             params['fields'] = ','.join([self._check('field', f, str) for f in fields])
 
-        return self._api.get('zone/{}'.format(self._check('id', id, int)),
-            params=params).json()['response']
+        return self._api.get(
+            f"zone/{self._check('id', id, int)}", params=params
+        ).json()['response']
 
     def edit(self, id, **kw):
         '''
@@ -126,8 +127,9 @@ class ScanZoneAPI(SCEndpoint):
             ...     ips=['127.0.0.1'], scanner_ids=[1])
         '''
         payload = self._constructor(**kw)
-        return self._api.patch('zone/{}'.format(self._check('id', id, int)),
-            json=payload).json()['response']
+        return self._api.patch(
+            f"zone/{self._check('id', id, int)}", json=payload
+        ).json()['response']
 
 
     def list(self, fields=None):
@@ -148,7 +150,7 @@ class ScanZoneAPI(SCEndpoint):
             >>> for zone in sc.scan_zones.list():
             ...     pprint(zone)
         '''
-        params = dict()
+        params = {}
         if fields:
             params['fields'] = ','.join([self._check('field', f, str)
                 for f in fields])
@@ -171,5 +173,6 @@ class ScanZoneAPI(SCEndpoint):
         Examples:
             >>> sc.scan_zones.delete(1)
         '''
-        return self._api.delete('zone/{}'.format(
-            self._check('id', id, int))).json()['response']
+        return self._api.delete(f"zone/{self._check('id', id, int)}").json()[
+            'response'
+        ]

@@ -107,13 +107,13 @@ class NessusReportv2(object):
                     # on the cached HostProperties that we gathered before, and then
                     # return the data as a python dictionary.
                     vuln = dict(elem.attrib)
-                    vuln.update(self._cache)
+                    vuln |= self._cache
 
                     # all of the information we have passed into the vuln dictionary
                     # needs to be normalized.  Here we will pass each item through
                     # the definition parser to make sure any known values are
                     # formatted properly.
-                    for k in vuln.keys():
+                    for k in vuln:
                         vuln[k] = self._defs(k, vuln[k])
 
                     for c in elem:

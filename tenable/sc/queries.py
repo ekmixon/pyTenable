@@ -28,7 +28,7 @@ class QueryAPI(SCEndpoint):
         Handles parsing the keywords and returns a query definition document
         '''
         query = self._query_constructor(*filters, **kw)
-        kw = dict_merge(kw, query.get('query', dict()))
+        kw = dict_merge(kw, query.get('query', {}))
 
         if 'name' in kw:
             self._check('name', kw['name'], str)
@@ -160,12 +160,13 @@ class QueryAPI(SCEndpoint):
             >>> query = sc.queries.details(1)
             >>> pprint(query)
         '''
-        params = dict()
+        params = {}
         if fields:
             params['fields'] = ','.join([self._check('field', f, str) for f in fields])
 
-        return self._api.get('query/{}'.format(self._check('id', id, int)),
-            params=params).json()['response']
+        return self._api.get(
+            f"query/{self._check('id', id, int)}", params=params
+        ).json()['response']
 
     def edit(self, id, *filters, **kw):
         '''
@@ -217,8 +218,9 @@ class QueryAPI(SCEndpoint):
             >>> query = sc.queries.edit()
         '''
         payload = self._constructor(*filters, **kw)
-        return self._api.patch('query/{}'.format(
-            self._check('id', id, int)), json=payload).json()['response']
+        return self._api.patch(
+            f"query/{self._check('id', id, int)}", json=payload
+        ).json()['response']
 
     def delete(self, id):
         '''
@@ -236,8 +238,9 @@ class QueryAPI(SCEndpoint):
         Examples:
             >>> sc.queries.delete(1)
         '''
-        return self._api.delete('query/{}'.format(
-            self._check('id', id, int))).json()['response']
+        return self._api.delete(f"query/{self._check('id', id, int)}").json()[
+            'response'
+        ]
 
     def list(self, fields=None):
         '''
@@ -257,7 +260,7 @@ class QueryAPI(SCEndpoint):
             >>> for query in sc.queries.list():
             ...     pprint(query)
         '''
-        params = dict()
+        params = {}
         if fields:
             params['fields'] = ','.join([self._check('field', f, str)
                 for f in fields])
@@ -281,10 +284,12 @@ class QueryAPI(SCEndpoint):
         Examples:
             >>> sc.queries.share(1, group_1, group_2)
         '''
-        return self._api.post('query/{}/share'.format(
-            self._check('id', id, int)), json={
-                'groups': [{'id': self._check('group:id', i, int)}
-                    for i in groups]}).json()['response']
+        return self._api.post(
+            f"query/{self._check('id', id, int)}/share",
+            json={
+                'groups': [{'id': self._check('group:id', i, int)} for i in groups]
+            },
+        ).json()['response']
 
     def tags(self):
         '''

@@ -28,7 +28,6 @@ def test_pagination_filter_schema():
 
     # Test that snake_cake to camelCase works correctly:
     resp = schema.load(('first_seen', 'equals', 'something'))
-    assert {'firstSeen': {'equals': 'something'}}
 
 
 def test_pagination_order_schema():

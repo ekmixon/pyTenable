@@ -99,9 +99,7 @@ class ScansAPI(TIOEndpoint):
             :obj:`dict`:
                 The resulting scan document based on the kwargs provided.
         '''
-        scan = {
-            'settings': dict(),
-        }
+        scan = {'settings': {}}
 
         # If a template is specified, then we will pull the listing of available
         # templates and set the policy UUID to match the template name given.
@@ -172,7 +170,7 @@ class ScansAPI(TIOEndpoint):
         # For credentials, we will simply push the dictionary as-is into the
         # the credentials.add sub-document.
         if 'credentials' in kwargs:
-            scan['credentials'] = {'add': dict()}
+            scan['credentials'] = {'add': {}}
             scan['credentials']['add'] = self._check(
                 'credentials', kwargs['credentials'], dict)
             del kwargs['credentials']

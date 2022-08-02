@@ -96,27 +96,27 @@ class BaseFilterRuleSchema(Schema):
         '''
         # We don't want to modify the original filter data, so we will be
         # performing a shallow copy instead of the default ref assignment.
-        if self.filters:
-            f = copy(self.filters.get(value, dict()))
+        if not self.filters:
+            return {}
+        f = copy(self.filters.get(value, {}))
 
             # If no filter was returned and filter checking was enabled, then we
             # should throw an error informing the caller that the filter wasn't
             # a supported filter.
-            if f == dict():
-                raise ValidationError('not a supported filter')
+        if f == {}:
+            raise ValidationError('not a supported filter')
 
-            # Convert the pattern, choices, and operators into the expected
-            # validators, overloading the original data.
-            if f.get('pattern'):
-                f['pattern'] = v.Regexp(f['pattern'])
-            if f.get('choices'):
-                f['choices'] = v.OneOf(f['choices'])
-            if f.get('operators'):
-                f['operators'] = v.OneOf(f['operators'])
+        # Convert the pattern, choices, and operators into the expected
+        # validators, overloading the original data.
+        if f.get('pattern'):
+            f['pattern'] = v.Regexp(f['pattern'])
+        if f.get('choices'):
+            f['choices'] = v.OneOf(f['choices'])
+        if f.get('operators'):
+            f['operators'] = v.OneOf(f['operators'])
 
-            # Return the modified filter to the caller.
-            return f
-        return dict()
+        # Return the modified filter to the caller.
+        return f
 
     @validates_schema
     def validate_against_filter(self, item, **kwargs):

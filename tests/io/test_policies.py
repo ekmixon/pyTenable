@@ -13,7 +13,7 @@ def test_configure_id_typeerror(api):
     test to raise the exception when type of id is not as defined
     '''
     with pytest.raises(TypeError):
-        api.policies.configure('nope', dict())
+        api.policies.configure('nope', {})
 
 
 @pytest.mark.vcr()
@@ -31,7 +31,7 @@ def test_configure_policy_notfounderror(api):
     test to raise the exception when a policy to be configured is not found
     '''
     with pytest.raises(NotFoundError):
-        api.policies.configure(1, dict())
+        api.policies.configure(1, {})
 
 
 @pytest.mark.vcr()

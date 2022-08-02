@@ -40,9 +40,9 @@ class FileDownloadError(RestflyException):
     '''
 
     def __init__(self, resource: str, resource_id: str, filename: str):
-        self.resource = str(resource)
-        self.resource_id = str(resource_id)
-        self.filename = str(filename)
+        self.resource = resource
+        self.resource_id = resource_id
+        self.filename = filename
         self.msg = (f'resource {resource}:{resource_id} '
                     f'requested file {filename} and has failed.'
                     )

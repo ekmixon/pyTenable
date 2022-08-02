@@ -65,7 +65,7 @@ class Downloads(APIPlatform):
 
     def __init__(self, api_token=None, **kwargs):
         if not api_token:
-            api_token = os.getenv('{}_API_TOKEN'.format(self._env_base))
+            api_token = os.getenv(f'{self._env_base}_API_TOKEN')
         kwargs['api_token'] = api_token
         super().__init__(**kwargs)
 
@@ -116,7 +116,7 @@ class Downloads(APIPlatform):
         Examples:
             >>> details = dl.details('nessus')
         '''
-        return self.get('pages/{}'.format(page))
+        return self.get(f'pages/{page}')
 
     def download(self, page, package, fobj=None):
         '''
@@ -143,8 +143,7 @@ class Downloads(APIPlatform):
         if not fobj:
             fobj = BytesIO()
 
-        resp = self.get(
-            'pages/{}/files/{}'.format(page, package), stream=True, box=False)
+        resp = self.get(f'pages/{page}/files/{package}', stream=True, box=False)
 
         # Lets stream the file into the file-like object...
         for chunk in resp.iter_content(chunk_size=1024):

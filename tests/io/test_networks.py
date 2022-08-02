@@ -25,7 +25,6 @@ def fixture_network(request, api, vcr):
                 api.networks.delete(network['uuid'])
         except APIError as err:
             log_exception(err)
-            pass
 
     request.addfinalizer(teardown)
     return network
@@ -165,7 +164,7 @@ def test_networks_edit_success(api, network):
     '''
     test to update the specified network resource.
     '''
-    resp = api.networks.edit(network['uuid'], 'New Name - {}'.format(uuid.uuid4()))
+    resp = api.networks.edit(network['uuid'], f'New Name - {uuid.uuid4()}')
     assert isinstance(resp, dict)
     check(resp, 'owner_uuid', 'uuid')
     check(resp, 'created', int)
@@ -519,28 +518,30 @@ def test_networks_list_fileds(api):
 
 def test_network_create_assets_ttl_days_typeerror(api):
     with pytest.raises(TypeError):
-        api.networks.create('New Name - {}'.format(uuid.uuid4()), 'something', 'something')
+        api.networks.create(f'New Name - {uuid.uuid4()}', 'something', 'something')
 
 
 @pytest.mark.vcr()
 def test_network_create_assets_ttl_days_invalid_input_error(api):
     with pytest.raises(BadRequestError):
-        api.networks.create('New Name - {}'.format(uuid.uuid4()), 'something', -5)
+        api.networks.create(f'New Name - {uuid.uuid4()}', 'something', -5)
 
 
 @pytest.mark.vcr()
 def test_network_edit_assets_ttl_days_type_error(api):
     with pytest.raises(TypeError):
-        network = api.networks.create('Network-{}'.format(uuid.uuid4()))
-        api.networks.edit(network_id=network['uuid'],
-                          name='New Name - {}'.format(uuid.uuid4()),
-                          assets_ttl_days='something')
+        network = api.networks.create(f'Network-{uuid.uuid4()}')
+        api.networks.edit(
+            network_id=network['uuid'],
+            name=f'New Name - {uuid.uuid4()}',
+            assets_ttl_days='something',
+        )
 
 
 @pytest.mark.vcr()
 def test_network_edit_assets_ttl_days_invalid_input_error(api):
     with pytest.raises(BadRequestError):
-        network = api.networks.create('Network-{}'.format(uuid.uuid4()))
+        network = api.networks.create(f'Network-{uuid.uuid4()}')
         api.networks.edit(network_id=network['uuid'],
                           name='something',
                           assets_ttl_days=-5)

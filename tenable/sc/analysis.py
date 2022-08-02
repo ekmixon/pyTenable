@@ -129,13 +129,18 @@ class AnalysisResultsIterator(SCResultsIterator):
         if page_size == records and total_records:
             self.total = int(total_records)
         else:
-            self._log.warning(' '.join([
-                'API Recordkeeping error.',
-                'api_total={},'.format(str(total_records)),
-                'api_count={},'.format(str(records)),
-                'page_size={},'.format(str(page_size)),
-                'iter_total={}'.format(str(self.total))
-            ]))
+            self._log.warning(
+                ' '.join(
+                    [
+                        'API Recordkeeping error.',
+                        f'api_total={str(total_records)},',
+                        f'api_count={str(records)},',
+                        f'page_size={page_size},',
+                        f'iter_total={str(self.total)}',
+                    ]
+                )
+            )
+
             if page_size < self._limit:
                 self.total = self.count + page_size
             else:
@@ -154,12 +159,10 @@ class AnalysisAPI(SCEndpoint):
 
         offset = 0
         limit = 1000
-        pages = None
-
         # Call the query constructor to build the query if necessary./
         kw = self._query_constructor(*filters, **kw)
 
-        payload = kw['payload'] if 'payload' in kw else dict()
+        payload = kw['payload'] if 'payload' in kw else {}
         payload['query'] = kw['query']
 
         if 'sort_field' in kw:
@@ -177,23 +180,13 @@ class AnalysisAPI(SCEndpoint):
         if 'limit' in kw:
             limit = self._check('limit', kw['limit'], int, default=200)
 
-        if 'pages' in kw:
-            pages = self._check('pages', kw['pages'], int)
-
+        pages = self._check('pages', kw['pages'], int) if 'pages' in kw else None
         if payload.get('sourceType') in ['individual']:
             payload['query']['view'] = self._check(
                 'view', kw.get('view', 'all'), str,
                 choices=['all', 'new', 'patched'], default='all')
 
-        if 'json_result' in kw and kw['json_result']:
-            # if the json_result flag is set, then we do not want to return an
-            # iterator, and instead just want to return the results section of
-            # the response.
-            payload['query']['startOffset'] = offset
-            payload['query']['endOffset'] = limit + offset
-            return self._api.post(
-                'analysis', json=payload).json()['response']
-        else:
+        if 'json_result' not in kw or not kw['json_result']:
             # the default option is the return the AnalysisResultsIterator
             return AnalysisResultsIterator(self._api,
                 _offset=offset,
@@ -201,6 +194,13 @@ class AnalysisAPI(SCEndpoint):
                 _query=payload,
                 _pages_total=pages,
             )
+        # if the json_result flag is set, then we do not want to return an
+        # iterator, and instead just want to return the results section of
+        # the response.
+        payload['query']['startOffset'] = offset
+        payload['query']['endOffset'] = limit + offset
+        return self._api.post(
+            'analysis', json=payload).json()['response']
 
     def vulns(self, *filters, **kw):
         '''

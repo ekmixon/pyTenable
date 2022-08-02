@@ -565,9 +565,9 @@ def test_policies_export_policy(security_center, policy):
     '''
     test policies export for success
     '''
-    with open('{}.xml'.format(policy['id']), 'wb') as pfile:
+    with open(f"{policy['id']}.xml", 'wb') as pfile:
         security_center.policies.export_policy(int(policy['id']), fobj=pfile)
-    os.remove('{}.xml'.format(policy['id']))
+    os.remove(f"{policy['id']}.xml")
 
 
 @pytest.mark.vcr()
@@ -575,9 +575,9 @@ def test_policies_export_policy_no_file(security_center, policy):
     '''
     test policies export with no file
     '''
-    with open('{}.xml'.format(policy['id']), 'wb'):
+    with open(f"{policy['id']}.xml", 'wb'):
         security_center.policies.export_policy(int(policy['id']))
-    os.remove('{}.xml'.format(policy['id']))
+    os.remove(f"{policy['id']}.xml")
 
 
 def test_policies_import_policy_name_typeerror(security_center):
